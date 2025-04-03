@@ -13,9 +13,6 @@
 
 class Shader {
    public:
-    // 程序ID
-    unsigned int ID;
-
     // 构造器读取并构建着色器
     Shader(const std::string& vertexPath, const std::string& fragmentPath);
 
@@ -35,6 +32,9 @@ class Shader {
     void setMat2(const std::string& name, const glm::mat2& mat) const;
     void setMat3(const std::string& name, const glm::mat3& mat) const;
     void setMat4(const std::string& name, const glm::mat4& mat) const;
+
+    // 程序ID
+    unsigned int ID;
 
    private:
     void checkCompileErrors(unsigned int shader, std::string type);
