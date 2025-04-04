@@ -9,13 +9,7 @@
 #include "shader.h"
 #include "texure.h"
 #include "trans.h"
-#include "vertex.h"
-
-// 调试回调函数
-void APIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-    std::cerr << "GL CALLBACK: " << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "") << " type = " << type << ", severity = " << severity
-              << ", message = " << message << std::endl;
-}
+#include "vertexShaderLoader.h"
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
@@ -56,37 +50,25 @@ int main() {
     // 启用鼠标监听
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  // 隐藏鼠标
 
-#ifdef DEBUG
-    #if MY_GLFW_CONTEXT_VERSION_MAJOR >= 4 && MY_GLFW_CONTEXT_VERSION_MINOR >= 3
-    // 启用调试输出
-    std::cerr << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
-
-    glEnable(GL_DEBUG_OUTPUT);
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-
-    glDebugMessageCallback(MessageCallback, nullptr);
-    #endif
-#endif
-
     //---------------------------------顶点数据----------------------------------
 
-    std::shared_ptr<Shader> cubeShader     = std::make_shared<Shader>("../src/shader/cube.vs", "../src/shader/cube.fs");
-    std::shared_ptr<Shader> lightingShader = std::make_shared<Shader>("../src/shader/light.vs", "../src/shader/light.fs");
+    std::shared_ptr<Shader> cubeShader     = std::make_shared<Shader>("../src/shader/cube.vsh", "../src/shader/cube.fsh");
+    std::shared_ptr<Shader> lightingShader = std::make_shared<Shader>("../src/shader/light.vsh", "../src/shader/light.fsh");
 
     // 立方体的八个顶点(实际每个面都有2个独立的三角形)
 
-    modelInit();
+    Model m = Model();  // 立方体模型
 
-    vertex cubeVertex(vertices, indices, prop);  // 立方体
+    VertexShaderLoader cubeVertex(m);  // 立方体
 
-    vertex ligtingVertex(vertices, indices, prop);  // 光源
+    VertexShaderLoader ligtingVertex(m);  // 光源
 
 #ifdef USETEXURE
-    //------------------------- 纹理-----------------------------
+                                          //------------------------- 纹理-----------------------------
 
-    texure container("../texure/container.jpg", GL_TEXTURE0);  // 纹理单元0
+    Texure container("../texure/container.jpg", GL_TEXTURE0);  // 纹理单元0
 
-    texure awesomef ace("../texure/awesomeface.png", GL_TEXTURE1, true);  // 纹理单元1
+    Texure awesomef ace("../texure/awesomeface.png", GL_TEXTURE1, true);  // 纹理单元1
 
     // myShader->use();                                                 // 不要忘记在设置uniform变量之前激活着色器程序！
     // glUniform1i(glGetUniformLocation(myShader->ID, "texture1"), 0);  // 手动设置
@@ -168,7 +150,7 @@ int main() {
         glfwPollEvents();
     }
 
-    vertex::deleteBuffer();
+    VertexShaderLoader::deleteBuffer();
     glfwTerminate();
     return 0;
 }

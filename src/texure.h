@@ -8,9 +8,9 @@
 #include <GLFW/glfw3.h>
 #include <stb_image/stb_image.h>
 
-class texure {
+class Texure {
    public:
-    texure(const char* texPath, const unsigned int GL_TEXURE_TYPE, const bool flip = false) : width(width), height(height), nrChannels(nrChannels) {
+    Texure(const char* texPath, const unsigned int GL_TEXURE_TYPE, const bool flip = false) : width(width), height(height), nrChannels(nrChannels) {
         glGenTextures(1, &textureID);
         glBindTexture(GL_TEXTURE_2D, textureID);  // 绑定纹理对象
         glActiveTexture(GL_TEXURE_TYPE);          // 激活纹理单元

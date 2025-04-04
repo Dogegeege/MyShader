@@ -8,8 +8,14 @@
 
 #include <GLFW/glfw3.h>
 
-#define MY_GLFW_CONTEXT_VERSION_MAJOR 3
+#define MY_GLFW_CONTEXT_VERSION_MAJOR 4
 #define MY_GLFW_CONTEXT_VERSION_MINOR 3
+
+// 调试回调函数
+void APIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+    std::cerr << "GL CALLBACK: " << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "") << " type = " << type << ", severity = " << severity
+              << ", message = " << message << std::endl;
+}
 
 std::optional<GLFWwindow*> glInit(const int screenWidth, const int screenHeight, const char* title) {
     glfwInit();
@@ -35,6 +41,18 @@ std::optional<GLFWwindow*> glInit(const int screenWidth, const int screenHeight,
         glfwTerminate();
         return std::nullopt;
     }
+
+#ifdef DEBUG
+    #if MY_GLFW_CONTEXT_VERSION_MAJOR >= 4 && MY_GLFW_CONTEXT_VERSION_MINOR >= 3
+    // 启用调试输出
+    std::cerr << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
+
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+    glDebugMessageCallback(MessageCallback, nullptr);
+    #endif
+#endif
 
     return window;
 }
