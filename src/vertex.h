@@ -5,8 +5,18 @@
 
 #include <GLFW/glfw3.h>
 
+/**
+ * @param VAO  顶点数组对象(Vertex Array Object, VAO)存储顶点的结构定义，用于解析VBO中的属性。
+ * @param VBO  顶点缓冲对象(Vertex Buffer Objects, VBO)调用显存并存储所有顶点数据供显卡使用的缓冲对象。
+ * @param EBO  索引缓冲对象
+ */
 class vertex {
    public:
+    /**
+     * @param vertices 顶点类容器
+     * @param indicies 索引类容器
+     * @param prop 顶点属性类容器，用于VAO配置，区分不同的顶点属性
+     */
     vertex(const std::vector<float>&        vertices,
            const std::vector<unsigned int>& indicies,
            const std::vector<unsigned int>& prop,

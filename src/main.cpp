@@ -3,13 +3,9 @@
 #include <memory>
 #include <vector>
 
-#include <glad/glad.h>
-//
-#include <GLFW/glfw3.h>
-#include <stb_image/stb_image.h>
-
 #include "camera.h"
 #include "glInit.h"
+#include "model.h"
 #include "shader.h"
 #include "texure.h"
 #include "trans.h"
@@ -21,36 +17,14 @@ void APIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum seve
               << ", message = " << message << std::endl;
 }
 
-const unsigned int SCR_WIDTH  = 800;
-const unsigned int SCR_HEIGHT = 600;
-
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-bool   firstMouse = true;
-
-float lastX = SCR_WIDTH / 2.0;
-float lastY = SCR_HEIGHT / 2.0;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    if (firstMouse == true) {
-        lastX      = xpos;
-        lastY      = ypos;
-        firstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-    lastX         = xpos;
-    lastY         = ypos;
-
-    float sensitivity = 0.1;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    camera.ProcessMouseMovement(xpos, ypos);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
@@ -64,6 +38,8 @@ void processInput(GLFWwindow* window, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) camera.ProcessKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) camera.ProcessKeyboard(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) camera.ProcessKeyboard(UP, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) camera.ProcessKeyboard(DOWN, deltaTime);
 }
 
 int main() {
@@ -99,29 +75,7 @@ int main() {
 
     // 立方体的八个顶点(实际每个面都有2个独立的三角形)
 
-    std::vector<float> vertices = {
-        -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.5f,  -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f, 0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f,
-        0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, -0.5f, 0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f, -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f,
-
-        -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.5f,  -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  -0.5f, 0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,
-
-        -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  -0.5f, 0.5f,  -0.5f, -1.0f, 0.0f,  0.0f,  -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  -0.5f, -0.5f, 0.5f,  -1.0f, 0.0f,  0.0f,  -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,
-
-        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.5f,  0.5f,  -0.5f, 1.0f,  0.0f,  0.0f,  0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,
-        0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  0.5f,  -0.5f, 0.5f,  1.0f,  0.0f,  0.0f,  0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-        -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.5f,  -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,
-        0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  -0.5f, -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,
-
-        -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.5f,  0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  -0.5f, 0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f};
-
-    std::vector<unsigned int> indices(36);
-    for (int i = 0; i < 36; i++) { indices[i] = i; }
-
-    const std::vector<unsigned int> prop = {3, 3};
+    modelInit();
 
     vertex cubeVertex(vertices, indices, prop);  // 立方体
 
@@ -178,15 +132,16 @@ int main() {
         cubeShader->setVec3("objectColor", 1.0f, 0.5f, 0.31f);  // 物体颜色
         cubeShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);    // 发光颜色
         cubeShader->setVec3("lightPos", lightPositions[0]);     // 光源位置
+        cubeShader->setVec3("viewPos", camera.Position);        // 摄像机位置
 
         for (int i = 0; i < 10; i++) {
             // 混合值
             float timeValue = glfwGetTime();
-            float mixValue  = 1.f * static_cast<float>(sin(timeValue) / 2.0f);
+            float mixValue  = 2.f * static_cast<float>(sin(timeValue) / 2.0f);
 
-            cubeShader->setFloat("mixValue", mixValue);
+            // cubeShader->setFloat("mixValue", mixValue);
 
-            cubeShader->setMat4("model", glm::translate(model, cubePositions[i]));
+            cubeShader->setMat4("model", glm::translate(model, cubePositions[i] + mixValue));
             cubeShader->setMat4("view", view);
             cubeShader->setMat4("projection", projection);
 
