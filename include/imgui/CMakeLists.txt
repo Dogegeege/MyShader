@@ -12,8 +12,10 @@ target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 只需要backends中OpenGL3的源文件
 file(GLOB IMGUI_BACKENDS_SRC
-    backends/opengl3.cpp
-    backends/opengl3.h
+    backends/imgui_impl_opengl3.cpp
+    backends/imgui_impl_opengl3.h
+    backends/imgui_impl_glfw.cpp
+    backends/imgui_impl_glfw.h
 )
 
 # 将backends文件添加到imgui库
