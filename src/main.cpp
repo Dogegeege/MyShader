@@ -66,16 +66,15 @@ int main() {
 
     VertexShaderLoader ligtingVertex(cube);  // 光源
 
-#ifdef USETEXURE
-                                             //------------------------- 纹理-----------------------------
+#ifndef USETEXURE
+    //------------------------- 纹理-----------------------------
 
-    Texure container("../texure/container.jpg");  // 纹理单元0
+    Texure diffuseMap("../texure/container2.png", 0);  // 纹理单元0
 
-    Texure awesomef ace("../texure/awesomeface.png", true);  // 纹理单元1
+    cubeShader->use();  // 不要忘记在设置uniform变量之前激活着色器程序！
 
-    // myShader->use();                                                 // 不要忘记在设置uniform变量之前激活着色器程序！
-    // glUniform1i(glGetUniformLocation(myShader->ID, "texture1"), 0);  // 手动设置
-    // myShader->setInt("texture2", 1);                                 // 或者使用着色器类设置
+    // 静态设置纹理
+    cubeShader->setInt("material.diffuse", 0);
 
 #endif
 
@@ -130,14 +129,12 @@ int main() {
 
         cubeShader->use();  // 使用着色器程序
 
-        model = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-        cubeShader->setVec3("Light.position", lightPositions[0]);  // 光源位置
-        cubeShader->setVec3("viewPos", camera.Position);           // 摄像机位置
+        // 摄像机属性
+        cubeShader->setMat4("model", model);
+        cubeShader->setMat4("view", view);
+        cubeShader->setMat4("projection", projection);
 
         // 设置材质属性
-        cubeShader->setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-        cubeShader->setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
         cubeShader->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
         cubeShader->setFloat("material.shininess", 32.0f);
 
@@ -145,22 +142,26 @@ int main() {
         cubeShader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
         cubeShader->setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);  // 将光照调暗了一些以搭配场景
         cubeShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        cubeShader->setVec3("light.position", lightPositions[0]);  // 光源位置
+
+        cubeShader->setVec3("viewPos", camera.Position);  // 摄像机位置
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseMap.getTexureObject());
 
         for (int i = 0; i < 10; i++) {
-            glm::vec3 lightColor;
-            lightColor.x = sin(glfwGetTime() * 2.0f);
-            lightColor.y = sin(glfwGetTime() * 0.7f);
-            lightColor.z = sin(glfwGetTime() * 1.3f);
+            // glm::vec3 lightColor;
+            // lightColor.x = sin(glfwGetTime() * 2.0f);
+            // lightColor.y = sin(glfwGetTime() * 0.7f);
+            // lightColor.z = sin(glfwGetTime() * 1.3f);
 
-            glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);    // 降低影响
-            glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);  // 很低的影响
+            // glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);    // 降低影响
+            // glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);  // 很低的影响
 
-            cubeShader->setVec3("light.ambient", ambientColor);
-            cubeShader->setVec3("light.diffuse", diffuseColor);
+            // cubeShader->setVec3("light.ambient", ambientColor);
+            // cubeShader->setVec3("light.diffuse", diffuseColor);
 
             cubeShader->setMat4("model", glm::translate(model, cubePositions[i]));
-            cubeShader->setMat4("view", view);
-            cubeShader->setMat4("projection", projection);
 
             cubeVertex.bindAndDrawElements();
         }
