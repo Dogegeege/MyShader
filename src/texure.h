@@ -10,7 +10,7 @@
 
 class Texure {
    public:
-    Texure(const char* texPath, const unsigned int texureID, const bool flip = false) : texureID(texureID) {
+    Texure(const char* texPath, const unsigned int texureUnitID, const bool flip = false) : texureUnitID(texureUnitID) {
         glGenTextures(1, &texure);
 
         // 载入时是否翻转图片
@@ -33,8 +33,8 @@ class Texure {
             glBindTexture(GL_TEXTURE_2D, texure);                                                      // 绑定纹理对象
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);  // 生成纹理
 
-            glActiveTexture(static_cast<unsigned int>(GL_TEXTURE0 + texureID));  // 激活纹理单元
-            glBindTexture(GL_TEXTURE_2D, texure);                                // 绑定纹理对象
+            glActiveTexture(static_cast<unsigned int>(GL_TEXTURE0 + texureUnitID));  // 激活纹理单元
+            glBindTexture(GL_TEXTURE_2D, texure);                                    // 绑定纹理对象
 
             glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -56,8 +56,8 @@ class Texure {
    private:
     int            width, height, nrChannels;
     unsigned char* data;
-    unsigned int   texure;    // 纹理对象指针
-    unsigned int   texureID;  // 纹理单元ID
+    unsigned int   texure;        // 纹理对象指针
+    unsigned int   texureUnitID;  // 纹理单元ID
 };
 
 #endif

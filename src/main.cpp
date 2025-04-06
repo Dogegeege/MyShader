@@ -3,6 +3,10 @@
 #include <memory>
 #include <vector>
 
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <imgui.h>
+
 #include "camera.h"
 #include "glInit.h"
 #include "model.h"
@@ -69,13 +73,14 @@ int main() {
 #ifndef USETEXURE
     //------------------------- 纹理-----------------------------
 
-    Texure diffuseMap("../texure/container2.png", 0);  // 纹理单元0
+    Texure diffuseMap("../texure/container2.png", 0);            // 纹理单元0
+    Texure specularMap("../texure/container2_specular.png", 1);  // 纹理单元1
 
     cubeShader->use();  // 不要忘记在设置uniform变量之前激活着色器程序！
 
     // 静态设置纹理
     cubeShader->setInt("material.diffuse", 0);
-
+    cubeShader->setInt("material.specular", 1);
 #endif
 
     //------------------------------变换---------------------------------------
@@ -148,6 +153,8 @@ int main() {
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMap.getTexureObject());
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularMap.getTexureObject());
 
         for (int i = 0; i < 10; i++) {
             // glm::vec3 lightColor;
@@ -172,8 +179,9 @@ int main() {
         // 构造光源
         lightingShader->use();
 
-        model      = glm::scale(glm::mat4(1.0), glm::vec3(1.f));  // 缩放
-        projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPositions[0]);
+        model = glm::scale(model, glm::vec3(0.2f));  // a smaller cube
 
         lightingShader->setMat4("model", glm::translate(model, lightPositions[0]));  // 随便给个位置
         lightingShader->setMat4("view", view);

@@ -24,6 +24,21 @@ if(NOT GLFW_LIB)    #如果找不到glfw的话这里会报错,本项目lib基于
     message(FATAL_ERROR "Cannot find glfw3 library")
 endif()
 
+###########################################################################
+# glm
+
+set(IMGUI_DIR ${PROJECT_SOURCE_DIR}/include/glm)
+
+add_subdirectory(${IMGUI_DIR})  # 添加glm子目录
+
+###########################################################################
+# imgui
+
+set(IMGUI_DIR ${PROJECT_SOURCE_DIR}/include/imgui)
+
+add_subdirectory(${IMGUI_DIR})  # 添加imgui子目录
+
+###########################################################################
 
 #可执行文件
 #file(GLOB SRC_FILE src/*.c src/*.cpp scr/*.h  src/glad/*.c )
@@ -31,4 +46,4 @@ file(GLOB SRC_FILE src/* include/glad/* include/stb_image/*)
 add_executable(LearnOpenGL ${SRC_FILE})  
 
 #目标链接文件
-target_link_libraries(LearnOpenGL ${GLFW_LIB})
+target_link_libraries(LearnOpenGL ${GLFW_LIB} imgui)  # 链接imgui库
