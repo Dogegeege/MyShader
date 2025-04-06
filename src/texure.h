@@ -10,11 +10,11 @@
 
 class Texure {
    public:
-    Texure(const char* texPath, const unsigned int GL_TEXURE_TYPE, const bool flip = false) : width(width), height(height), nrChannels(nrChannels) {
+    Texure(const char* texPath, const bool flip = false) : width(width), height(height), nrChannels(nrChannels) {
         glGenTextures(1, &textureID);
-        glBindTexture(GL_TEXTURE_2D, textureID);  // 绑定纹理对象
-        glActiveTexture(GL_TEXURE_TYPE);          // 激活纹理单元
-        glBindTexture(GL_TEXTURE_2D, textureID);  // 绑定纹理对象
+        glBindTexture(GL_TEXTURE_2D, textureID);                             // 绑定纹理对象
+        glActiveTexture(static_cast<unsigned int>(GL_TEXTURE + textureID));  // 激活纹理单元
+        glBindTexture(GL_TEXTURE_2D, textureID);                             // 绑定纹理对象
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);  // 纹理超出边界环绕模式
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

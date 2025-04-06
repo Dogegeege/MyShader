@@ -8,7 +8,6 @@
 #include "model.h"
 #include "shader.h"
 #include "texure.h"
-#include "trans.h"
 #include "vertexShaderLoader.h"
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -54,21 +53,25 @@ int main() {
 
     std::shared_ptr<Shader> cubeShader     = std::make_shared<Shader>("../src/shader/cube.vsh", "../src/shader/cube.fsh");
     std::shared_ptr<Shader> lightingShader = std::make_shared<Shader>("../src/shader/light.vsh", "../src/shader/light.fsh");
+    // std::shared_ptr<Shader> modelShader    = std::make_shared<Shader>("../src/shader/model.vsh", "../src/shader/model.fsh");
 
-    // 立方体的八个顶点(实际每个面都有2个独立的三角形)
+    // Model neuro = Model("../model/vtuber-neuro-sama-v3/source/_unique_vertices.csv",
+    //                     "../model/vtuber-neuro-sama-v3/source/_indices.csv",  // 导入体模型
+    //                     "../model/vtuber-neuro-sama-v3/source/_prop.csv", 4);
+    Model cube = Model();
 
-    Model m = Model();  // 立方体模型
+    // VertexShaderLoader modelVertex(neuro);  // nero
 
-    VertexShaderLoader cubeVertex(m);  // 立方体
+    VertexShaderLoader cubeVertex(cube);  // 立方体
 
-    VertexShaderLoader ligtingVertex(m);  // 光源
+    VertexShaderLoader ligtingVertex(cube);  // 光源
 
 #ifdef USETEXURE
-                                          //------------------------- 纹理-----------------------------
+                                             //------------------------- 纹理-----------------------------
 
-    Texure container("../texure/container.jpg", GL_TEXTURE0);  // 纹理单元0
+    Texure container("../texure/container.jpg");  // 纹理单元0
 
-    Texure awesomef ace("../texure/awesomeface.png", GL_TEXTURE1, true);  // 纹理单元1
+    Texure awesomef ace("../texure/awesomeface.png", true);  // 纹理单元1
 
     // myShader->use();                                                 // 不要忘记在设置uniform变量之前激活着色器程序！
     // glUniform1i(glGetUniformLocation(myShader->ID, "texture1"), 0);  // 手动设置
@@ -103,39 +106,72 @@ int main() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        cubeShader->use();  // 使用着色器程序
-
         glm::mat4 model      = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         glm::mat4 view       = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
-        cubeVertex.bindVertexArray();
+#ifdef MODEL
+        //--------------------------Model--------------------------------
+        model = glm::mat4(0.01f);
 
-        cubeShader->setVec3("objectColor", 1.0f, 0.5f, 0.31f);  // 物体颜色
-        cubeShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);    // 发光颜色
-        cubeShader->setVec3("lightPos", lightPositions[0]);     // 光源位置
-        cubeShader->setVec3("viewPos", camera.Position);        // 摄像机位置
+        modelShader->use();
+
+        modelShader->setVec3("objectColor", 1.0f, 0.5f, 0.31f);  // 物体颜色
+        modelShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);    // 发光颜色
+
+        modelShader->setMat4("model", glm::translate(model, cubePositions[0]));
+        modelShader->setMat4("view", view);
+        modelShader->setMat4("projection", projection);
+
+        modelVertex.bindAndDrawElements();
+        modelVertex.UnbindVertexArray();
+#endif
+        //--------------------------Cube--------------------------------
+
+        cubeShader->use();  // 使用着色器程序
+
+        model = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+        cubeShader->setVec3("Light.position", lightPositions[0]);  // 光源位置
+        cubeShader->setVec3("viewPos", camera.Position);           // 摄像机位置
+
+        // 设置材质属性
+        cubeShader->setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+        cubeShader->setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+        cubeShader->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        cubeShader->setFloat("material.shininess", 32.0f);
+
+        // 设置光源（对物体）属性
+        cubeShader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        cubeShader->setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);  // 将光照调暗了一些以搭配场景
+        cubeShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
         for (int i = 0; i < 10; i++) {
-            // 混合值
-            float timeValue = glfwGetTime();
-            float mixValue  = 2.f * static_cast<float>(sin(timeValue) / 2.0f);
+            glm::vec3 lightColor;
+            lightColor.x = sin(glfwGetTime() * 2.0f);
+            lightColor.y = sin(glfwGetTime() * 0.7f);
+            lightColor.z = sin(glfwGetTime() * 1.3f);
 
-            // cubeShader->setFloat("mixValue", mixValue);
+            glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);    // 降低影响
+            glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);  // 很低的影响
 
-            cubeShader->setMat4("model", glm::translate(model, cubePositions[i] + mixValue));
+            cubeShader->setVec3("light.ambient", ambientColor);
+            cubeShader->setVec3("light.diffuse", diffuseColor);
+
+            cubeShader->setMat4("model", glm::translate(model, cubePositions[i]));
             cubeShader->setMat4("view", view);
             cubeShader->setMat4("projection", projection);
 
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);  // 绘制的模式(三角形),(绘制顶点的个数)
+            cubeVertex.bindAndDrawElements();
         }
-        glBindVertexArray(0);
+        cubeVertex.UnbindVertexArray();
+
+        //---------------------------Light--------------------------------
 
         // 构造光源
         lightingShader->use();
 
-        model      = glm::mat4(1.0f);
-        view       = camera.GetViewMatrix();
+        model      = glm::scale(glm::mat4(1.0), glm::vec3(1.f));  // 缩放
         projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
         lightingShader->setMat4("model", glm::translate(model, lightPositions[0]));  // 随便给个位置
@@ -150,7 +186,7 @@ int main() {
         glfwPollEvents();
     }
 
-    VertexShaderLoader::deleteBuffer();
+    VertexShaderLoader::unBindBuffer();
     glfwTerminate();
     return 0;
 }

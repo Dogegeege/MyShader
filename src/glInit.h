@@ -8,7 +8,7 @@
 
 #include <GLFW/glfw3.h>
 
-#define MY_GLFW_CONTEXT_VERSION_MAJOR 4
+#define MY_GLFW_CONTEXT_VERSION_MAJOR 3
 #define MY_GLFW_CONTEXT_VERSION_MINOR 3
 
 // 调试回调函数
