@@ -1,0 +1,38 @@
+[
+{
+  "directory": "E:/Project/Learn_OpenGL/build",
+  "command": "C:\\MinGW64\\bin\\gcc.exe  @CMakeFiles/LearnOpenGL.dir/includes_C.rsp -g -o CMakeFiles\\LearnOpenGL.dir\\include\\glad\\glad.c.obj -c E:\\Project\\Learn_OpenGL\\include\\glad\\glad.c",
+  "file": "E:/Project/Learn_OpenGL/include/glad/glad.c",
+  "output": "CMakeFiles/LearnOpenGL.dir/include/glad/glad.c.obj"
+},
+{
+  "directory": "E:/Project/Learn_OpenGL/build",
+  "command": "C:\\MinGW64\\bin\\g++.exe  @CMakeFiles/LearnOpenGL.dir/includes_CXX.rsp -g -DDEBUG -std=gnu++20 -o CMakeFiles\\LearnOpenGL.dir\\include\\stb_image\\stb_image.cpp.obj -c E:\\Project\\Learn_OpenGL\\include\\stb_image\\stb_image.cpp",
+  "file": "E:/Project/Learn_OpenGL/include/stb_image/stb_image.cpp",
+  "output": "CMakeFiles/LearnOpenGL.dir/include/stb_image/stb_image.cpp.obj"
+},
+{
+  "directory": "E:/Project/Learn_OpenGL/build",
+  "command": "C:\\MinGW64\\bin\\g++.exe  @CMakeFiles/LearnOpenGL.dir/includes_CXX.rsp -g -DDEBUG -std=gnu++20 -o CMakeFiles\\LearnOpenGL.dir\\src\\camera.cpp.obj -c E:\\Project\\Learn_OpenGL\\src\\camera.cpp",
+  "file": "E:/Project/Learn_OpenGL/src/camera.cpp",
+  "output": "CMakeFiles/LearnOpenGL.dir/src/camera.cpp.obj"
+},
+{
+  "directory": "E:/Project/Learn_OpenGL/build",
+  "command": "C:\\MinGW64\\bin\\g++.exe  @CMakeFiles/LearnOpenGL.dir/includes_CXX.rsp -g -DDEBUG -std=gnu++20 -o CMakeFiles\\LearnOpenGL.dir\\src\\main.cpp.obj -c E:\\Project\\Learn_OpenGL\\src\\main.cpp",
+  "file": "E:/Project/Learn_OpenGL/src/main.cpp",
+  "output": "CMakeFiles/LearnOpenGL.dir/src/main.cpp.obj"
+},
+{
+  "directory": "E:/Project/Learn_OpenGL/build",
+  "command": "C:\\MinGW64\\bin\\g++.exe  @CMakeFiles/LearnOpenGL.dir/includes_CXX.rsp -g -DDEBUG -std=gnu++20 -o CMakeFiles\\LearnOpenGL.dir\\src\\model.cpp.obj -c E:\\Project\\Learn_OpenGL\\src\\model.cpp",
+  "file": "E:/Project/Learn_OpenGL/src/model.cpp",
+  "output": "CMakeFiles/LearnOpenGL.dir/src/model.cpp.obj"
+},
+{
+  "directory": "E:/Project/Learn_OpenGL/build",
+  "command": "C:\\MinGW64\\bin\\g++.exe  @CMakeFiles/LearnOpenGL.dir/includes_CXX.rsp -g -DDEBUG -std=gnu++20 -o CMakeFiles\\LearnOpenGL.dir\\src\\shader.cpp.obj -c E:\\Project\\Learn_OpenGL\\src\\shader.cpp",
+  "file": "E:/Project/Learn_OpenGL/src/shader.cpp",
+  "output": "CMakeFiles/LearnOpenGL.dir/src/shader.cpp.obj"
+}
+]
