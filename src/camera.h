@@ -23,11 +23,8 @@ constexpr unsigned int SCR_HEIGHT = 600;
 // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
 class Camera {
    public:
-    Camera(const glm::vec3& position = glm::vec3(0.0f, 0.0f, 0.0f),
-           const glm::vec3& up       = glm::vec3(0.0f, 1.0f, 0.0f),
-           const float      yaw      = YAW,
-           const float      pitch    = PITCH);
-    Camera(float posX, float posY, float posZ, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f, float yaw = YAW, float pitch = PITCH);
+    Camera(const glm::vec3& position = glm::vec3(0.0f, 0.0f, 0.0f), const glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f));
+    Camera(float posX, float posY, float posZ, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f);
 
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     inline glm::mat4 GetViewMatrix() { return glm::lookAt(Position, Position + Front, Up); }

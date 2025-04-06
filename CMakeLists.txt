@@ -42,7 +42,13 @@ add_subdirectory(${IMGUI_DIR})  # 添加imgui子目录
 
 #可执行文件
 #file(GLOB SRC_FILE src/*.c src/*.cpp scr/*.h  src/glad/*.c )
-file(GLOB SRC_FILE src/* include/glad/* include/stb_image/*)
+file(GLOB SRC_FILE
+    src/*
+    src/Application/*
+    include/glad/* 
+    include/stb_image/*
+)
+
 add_executable(LearnOpenGL ${SRC_FILE})  
 
 #目标链接文件

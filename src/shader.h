@@ -1,15 +1,16 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <glad/glad.h>  // 包含glad来获取所有的必须OpenGL头文件
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
+
+#include <glad/glad.h>  // 包含glad来获取所有的必须OpenGL头文件
+#include <imgui.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class Shader {
    public:
@@ -32,6 +33,9 @@ class Shader {
     void setMat2(const std::string& name, const glm::mat2& mat) const;
     void setMat3(const std::string& name, const glm::mat3& mat) const;
     void setMat4(const std::string& name, const glm::mat4& mat) const;
+
+    void setVec2(const std::string& name, const ImVec2& value) const;
+    void setVec4(const std::string& name, const ImVec4& value) const;
 
     // 程序ID
     unsigned int ID;

@@ -3,9 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
-#include <imgui.h>
+#include "Application/application.hpp"
 
 #include "camera.h"
 #include "glInit.h"
@@ -47,11 +45,20 @@ int main() {
 
     // 注册回调参数
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);  // 调整窗口
-    glfwSetCursorPosCallback(window, mouse_callback);                   // 鼠标移动参数
-    glfwSetScrollCallback(window, scroll_callback);                     // 鼠标滚轮参数
+    // glfwSetCursorPosCallback(window, mouse_callback);                   // 鼠标移动参数
+    glfwSetScrollCallback(window, scroll_callback);  // 鼠标滚轮参数
 
     // 启用鼠标监听
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  // 隐藏鼠标
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  // 隐藏鼠标
+
+    // 初始化 ImGui
+    IMGUI_CHECKVERSION();    // 检查 ImGui 版本
+    ImGui::CreateContext();  // 创建 ImGui 上下文
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;                                    // 获取 IO 对象
+    ImGui::StyleColorsDark();                    // 设置暗色主题
+    ImGui_ImplGlfw_InitForOpenGL(window, true);  // 初始化 GLFW 后端
+    ImGui_ImplOpenGL3_Init("#version 330");      // 初始化 OpenGL3 后端
 
     //---------------------------------顶点数据----------------------------------
 
@@ -89,15 +96,15 @@ int main() {
                                        glm::vec3(1.3f, -2.0f, -2.5f),   glm::vec3(1.5f, 2.0f, -2.5f),  glm::vec3(1.5f, 0.2f, -1.5f),
                                        glm::vec3(-1.3f, 1.0f, -1.5f)};
 
-    const glm::vec3 lightPositions[] = {
-        glm::vec3(1.2f, 0.0f, 2.0f),
-    };
+    glm::vec3 lightPositions(1.2f, 0.0f, 2.0f);
 
     glEnable(GL_DEPTH_TEST);  // 启用深度测试
 
     // timing
     float deltaTime = 0.0f;  // time between current frame and last frame
     float lastFrame = 0.0f;
+
+    app::application appinfo(false, 0, 0.0f, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // 创建应用程序对象
 
     while (glfwWindowShouldClose(window) == false) {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -147,7 +154,7 @@ int main() {
         cubeShader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
         cubeShader->setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);  // 将光照调暗了一些以搭配场景
         cubeShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        cubeShader->setVec3("light.position", lightPositions[0]);  // 光源位置
+        cubeShader->setVec3("light.position", lightPositions);  // 光源位置
 
         cubeShader->setVec3("viewPos", camera.Position);  // 摄像机位置
 
@@ -179,23 +186,49 @@ int main() {
         // 构造光源
         lightingShader->use();
 
+        float radius = 2.0f;
+
+        lightPositions.y = cos(appinfo.lightPose * camera.MovementSpeed) * radius;
+        lightPositions.z = sin(appinfo.lightPose * camera.MovementSpeed) * radius;
+
         model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPositions[0]);
+        model = glm::translate(model, lightPositions);
         model = glm::scale(model, glm::vec3(0.2f));  // a smaller cube
 
-        lightingShader->setMat4("model", glm::translate(model, lightPositions[0]));  // 随便给个位置
+        lightingShader->setMat4("model", glm::translate(model, lightPositions));  // 随便给个位置
         lightingShader->setMat4("view", view);
         lightingShader->setMat4("projection", projection);
 
-        ligtingVertex.bindVertexArray();
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        lightingShader->setVec4("lightColor", appinfo.lightColor);
+
+        ligtingVertex.bindAndDrawElements();
+
+        //-------------------------------imgui-----------------------------------------
+
+        // 开始新的一帧
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        appinfo.Render();
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());  // 渲染 ImGui 数据
+
+        //---------------------------------------------------------------------
+        // 处理事件
+        glfwPollEvents();
 
         // 交换缓冲
         glfwSwapBuffers(window);
-        glfwPollEvents();
     }
 
     VertexShaderLoader::unBindBuffer();
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
 }
