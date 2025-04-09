@@ -27,15 +27,19 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
     float     velocity = MovementSpeed * deltaTime;
     glm::vec3 lastPos  = Position;  // 记录上次位置
 
-    if (direction == FORWARD) Position += Front * velocity;
-    if (direction == BACKWARD) Position -= Front * velocity;
+    // 注意Front y方向的分量不能对移动产生影响
+    if (direction == FORWARD || direction == BACKWARD) {
+        glm::vec3 Front_xz = glm::normalize(glm::vec3(Front.x, 0.f, Front.z));
+
+        if (direction == FORWARD) Position += Front_xz * velocity;   // <-- 除了上下移动，其他都限制在y=0平面内
+        if (direction == BACKWARD) Position -= Front_xz * velocity;  // <-- 保证摄像机在y=0平面移动
+    }
     if (direction == LEFT) Position -= Right * velocity;
     if (direction == RIGHT) Position += Right * velocity;
     if (direction == UP) Position += WorldUp * velocity;
     if (direction == DOWN) Position -= WorldUp * velocity;
 
-    if (direction != UP && direction != DOWN)  // <-- 除了上下移动，其他都限制在y=0平面内
-        Position.y = lastPos.y;                // <-- 保证摄像机在y=0平面移动
+    // if (direction != UP && direction != DOWN) Position.y = lastPos.y;
 }
 
 /**
