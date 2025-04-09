@@ -6,7 +6,7 @@
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
-#include <stb_image/stb_image.h>
+#include <stb_image.h>
 
 class Texure {
    public:
@@ -33,9 +33,6 @@ class Texure {
             glBindTexture(GL_TEXTURE_2D, texure);                                                      // 绑定纹理对象
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);  // 生成纹理
 
-            glActiveTexture(static_cast<unsigned int>(GL_TEXTURE0 + texureUnitID));  // 激活纹理单元
-            glBindTexture(GL_TEXTURE_2D, texure);                                    // 绑定纹理对象
-
             glGenerateMipmap(GL_TEXTURE_2D);
 
             // 纹理超出边界环绕模式
@@ -45,6 +42,8 @@ class Texure {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);  // 纹理被缩小的时候使用MipMap
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);                // 被放大时使用线性过滤（模糊）
 
+            glBindTexture(GL_TEXTURE_2D, 0);  // 解绑纹理对象
+
         } else {
             std::cerr << "Failed to load texture:\n" << std::endl;
         }
@@ -52,6 +51,11 @@ class Texure {
     };
 
     inline unsigned int getTexureObject() { return texure; }
+
+    inline void acitVeTexure() {
+        glActiveTexture(static_cast<unsigned int>(GL_TEXTURE0 + texureUnitID));  // 激活纹理单元
+        glBindTexture(GL_TEXTURE_2D, texure);                                    // 绑定纹理对象
+    }
 
    private:
     int            width, height, nrChannels;

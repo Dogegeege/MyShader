@@ -58,10 +58,10 @@ class Camera {
     float lastX;
     float lastY;
 
+    bool firstMouse;
+
    private:
     // calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors();
-
-    bool firstMouse;
 };
 #endif

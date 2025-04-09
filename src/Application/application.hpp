@@ -7,7 +7,9 @@ namespace app {
 class application {
    public:
     application(bool drawLight, int cnt, float lightPose, ImVec4 lightColor)
-        : drawLight(drawLight), cnt(cnt), lightPose(lightPose), lightColor(lightColor) {}
+        : drawLight(drawLight), cnt(cnt), lightPose(lightPose), lightColor(lightColor) {
+        lightIntesity = 0.0f;
+    }
 
     // Render 函数：负责绘制 ImGui 界面
     inline void Render() {
@@ -26,6 +28,8 @@ class application {
         ImGui::SliderFloat("LightPosition", &lightPose, 0.0f, 5.0f);
         ImGui::ColorEdit3("LightColor", (float*)&lightColor);  // 显示一个颜色编辑器
 
+        ImGui::SliderFloat("LightIntesity", &lightIntesity, 1.0f, 5.0f);
+
         if (ImGui::Button("TestButton")) cnt++;
         ImGui::SameLine();  // 显示在同一行
 
@@ -36,6 +40,7 @@ class application {
     bool   drawLight;
     int    cnt;
     float  lightPose;
+    float  lightIntesity;
     ImVec4 lightColor;
 };
 
