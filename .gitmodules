@@ -1,0 +1,6 @@
+[submodule "include/glfw"]
+	path = include/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "include/glm-1.0.1"]
+	path = include/glm-1.0.1
+	url = https://github.com/icaven/glm.git
