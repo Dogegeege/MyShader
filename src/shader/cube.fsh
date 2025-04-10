@@ -23,11 +23,6 @@ struct Light {
     
 };
 
-//in vec2 TexCoord;
-
-// uniform sampler2D texture1;
-// uniform sampler2D texture2;
-
 uniform vec3 viewPos;
 uniform Material material;
 uniform Light light;
