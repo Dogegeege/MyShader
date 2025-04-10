@@ -4,6 +4,18 @@ cmake_minimum_required(VERSION 3.23)
 set(CMAKE_CXX_STANDARD 20)
 set(TARGET_NAME LearnOpenGL)
 
+# 设置编译条件
+# if(MSVC)
+#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /MTd")
+# else()
+#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -std=c++20")
+#     if(NOT WIN32)
+#         set(GLAD_LIBRARIES dl)
+#     endif()
+# endif()
+
+
+
 project(${TARGET_NAME})
 
 add_subdirectory(include)
@@ -41,7 +53,6 @@ target_include_directories(${TARGET_NAME} PRIVATE
 #目标链接文件
 target_link_libraries(${TARGET_NAME} PUBLIC glad)
 target_link_libraries(${TARGET_NAME} PUBLIC glfw)
-target_link_libraries(${TARGET_NAME} PUBLIC glm)
 target_link_libraries(${TARGET_NAME} PUBLIC imgui)
 target_link_libraries(${TARGET_NAME} PUBLIC stb_image) 
 
