@@ -1,0 +1,59 @@
+set(INCLUDE_FOLDER "3rdParty")
+
+##############################################################################
+#glad
+
+if (NOT TARGET glad)
+    include(glad.cmake)
+    set_target_properties(glad PROPERTIES FOLDER ${INCLUDE_FOLDER}/glad)
+endif ()
+
+##############################################################################
+#glm
+
+#glm不需要编译
+
+##############################################################################
+#glfw
+
+if (NOT TARGET glfw)
+    option(GLFW_BUILD_EXAMPLES "" OFF)
+    option(GLFW_BUILD_TESTS "" OFF)
+    option(GLFW_BUILD_DOCS "" OFF)
+    option(GLFW_INSTALL "" OFF)
+
+    add_subdirectory(glfw)
+    set_target_properties(glfw PROPERTIES FOLDER ${INCLUDE_FOLDER}/glfw)
+    set_target_properties(update_mappings PROPERTIES FOLDER ${INCLUDE_FOLDER}/glfw)
+endif ()
+
+##############################################################################
+#imgui
+
+if (NOT TARGET imgui)
+    include(imgui.cmake)
+    set_target_properties(imgui PROPERTIES FOLDER ${INCLUDE_FOLDER}/imgui)
+endif ()
+
+##############################################################################
+#stb_image
+
+if (NOT TARGET stb_image)
+    include(stb_image.cmake)
+    set_target_properties(stb_image PROPERTIES FOLDER ${INCLUDE_FOLDER}/stb_image)
+endif ()
+
+##############################################################################
+#assimp
+
+if (NOT TARGET assimp)
+    option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
+    option(ASSIMP_BUILD_SAMPLES OFF)
+    option(ASSIMP_BUILD_TESTS OFF)
+    option(BUILD_SHARED_LIBS OFF)#OFF生成静态库
+
+    add_subdirectory(assimp)
+    # 为 assimp 设置单独的编译选项，禁用警告报错
+    set_target_properties(assimp PROPERTIES COMPILE_OPTIONS "-Wno-error")
+
+endif ()

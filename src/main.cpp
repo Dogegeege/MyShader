@@ -78,8 +78,8 @@ int main() {
 
     //!---------------------------------顶点数据----------------------------------
 
-    std::shared_ptr<Shader> cubeShader     = std::make_shared<Shader>("../../src/shader/cube.vsh", "../../src/shader/cube.fsh");
-    std::shared_ptr<Shader> lightingShader = std::make_shared<Shader>("../../src/shader/light.vsh", "../../src/shader/light.fsh");
+    std::shared_ptr<Shader> cubeShader     = std::make_shared<Shader>("../../assets/shader/cube.vsh", "../../assets/shader/cube.fsh");
+    std::shared_ptr<Shader> lightingShader = std::make_shared<Shader>("../../assets/shader/light.vsh", "../../assets/shader/light.fsh");
     // std::shared_ptr<Shader> modelShader    = std::make_shared<Shader>("../src/shader/model.vsh", "../src/shader/model.fsh");
 
     // Model neuro = Model("../model/vtuber-neuro-sama-v3/source/_unique_vertices.csv",
@@ -96,8 +96,8 @@ int main() {
 #ifndef USETEXURE
     //!------------------------- 纹理-----------------------------
 
-    Texure diffuseMap("../../texure/container2.png", 0);            // 纹理单元0
-    Texure specularMap("../../texure/container2_specular.png", 1);  // 纹理单元1
+    Texure diffuseMap("../../assets/texure/container2.png", 0);            // 纹理单元0
+    Texure specularMap("../../assets/texure/container2_specular.png", 1);  // 纹理单元1
 
     cubeShader->use();  // 不要忘记在设置uniform变量之前激活着色器程序！
 
