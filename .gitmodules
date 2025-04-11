@@ -1,13 +1,13 @@
-[submodule "include/glfw"]
-	path = include/glfw
+[submodule "3rdParty/glfw"]
+	path = 3rdParty/glfw
 	url = https://github.com/glfw/glfw.git
-[submodule "include/glm-1.0.1"]
-	path = include/glm-1.0.1
+[submodule "3rdParty/glm-1.0.1"]
+	path = 3rdParty/glm-1.0.1
 	url = https://github.com/icaven/glm.git
-[submodule "include/imgui-docking"]
-	path = include/imgui-docking
+[submodule "3rdParty/imgui-docking"]
+	path = 3rdParty/imgui-docking
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
-[submodule "include/assimp"]
-	path = include/assimp
+[submodule "3rdParty/assimp"]
+	path = 3rdParty/assimp
 	url = https://github.com/assimp/assimp.git
