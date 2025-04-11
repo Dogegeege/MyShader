@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.23)
 
-#C++标准
-set(CMAKE_CXX_STANDARD 20)
+# 项目名称和 C++ 标准
 set(TARGET_NAME LearnOpenGL)
+project(${TARGET_NAME})
+set(CMAKE_CXX_STANDARD 20)
 
 #设置编译条件
 if(MSVC)
@@ -14,32 +15,43 @@ else()
     endif()
 endif()
 
-####################################################################################################
-
-project(${TARGET_NAME})
-
-add_subdirectory(3rdParty)
-
-
 #可执行文件输出路径
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
 
+####################################################################################################
+# 添加子目录（第三方库）
+
+add_subdirectory(3rdParty)
+
+####################################################################################################
 
 
+#头文件
+file(GLOB PROJECT_HEADERS
+    include
+    include/Application
+)
+
+# 第三方库头文件
+file(GLOB THIRD_PARTY_HEADERS
+    3rdParty/glad/include
+    3rdParty/glfw/include
+    3rdParty/glm-1.0.1
+    3rdParty/imgui-docking
+    3rdParty/stb_image
+)
 
 
 #可执行文件
 file(GLOB PROJECT_SOURCES
     src/*.cpp
 )
-add_executable(${TARGET_NAME} ${PROJECT_SOURCES})  
 
 #着色器文件
-file(
-    GLOB PROJECT_SHADERS
+file(GLOB PROJECT_SHADERS
     assets/shader/*.vert
     assets/shader/*.vs
     assets/shader/*.vsh
@@ -50,28 +62,18 @@ file(
 
     assets/shader/*.geom
     assets/shader/*.geom
-
+    #....
 )
 
-#头文件
-file(
-    GLOB PROJECT_HEADERS
-    ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/include/Application
-)
 
-file(
-    GLOB 3RD_HEADERS
-    ${PROJECT_SOURCE_DIR}/3rdParty/glad/include
-    ${PROJECT_SOURCE_DIR}/3rdParty/glfw/include
-    ${PROJECT_SOURCE_DIR}/3rdParty/glm-1.0.1
-    ${PROJECT_SOURCE_DIR}/3rdParty/imgui-docking
-    ${PROJECT_SOURCE_DIR}/3rdParty/stb_image
-)
+####################################################################################################
+# 添加可执行文件
+add_executable(${TARGET_NAME} ${PROJECT_SOURCES})  
+
 
 # 添加头文件搜索路径
 target_include_directories(${TARGET_NAME} PRIVATE
-    ${3RD_HEADERS}
+    ${THIRD_PARTY_HEADERS}
     ${PROJECT_HEADERS}
 )
 
@@ -79,10 +81,11 @@ target_include_directories(${TARGET_NAME} PRIVATE
 source_group("headers" FILES ${PROJECT_HEADERS})
 source_group("shaders" FILES ${PROJECT_SHADERS})
 source_group("sources" FILES ${PROJECT_SOURCES})
-source_group("vendors" FILES ${3RD_HEADERS})
+source_group("3rdPartyHeaders" FILES ${THIRD_PARTY_HEADERS})
 
 
-#目标链接文件
+####################################################################################################
+# 链接第三方库
 target_link_libraries(${TARGET_NAME} PUBLIC glad)
 target_link_libraries(${TARGET_NAME} PUBLIC glfw)
 target_link_libraries(${TARGET_NAME} PUBLIC imgui)
