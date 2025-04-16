@@ -1,0 +1,322 @@
+# Blender 3.6.16 MTL File: 'Obj nr.blend'
+# www.blender.org
+
+newmtl Emotes
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 3
+map_Kd textures/NRv3r_Emotes.png
+map_d textures/NRv3r_Emotes.png
+
+newmtl Eyes
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_Eyes.png
+
+newmtl Eyes-Evil
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_Eyes-evil.png
+
+newmtl Eyes_Blank
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 3
+map_Kd textures/NRv3r_EyesBlank.png
+map_d textures/NRv3r_EyesBlank.png
+
+newmtl Eyes_Blank-Evil
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_EyesBlank-evil.png
+
+newmtl Eyes_DZ
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_EyesDZ.png
+
+newmtl Eyes_DZ-Evil
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_EyesDZ-evil.png
+
+newmtl Eyes_Heart
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_EyesHeart.png
+
+newmtl Eyes_Heart-Evil
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_EyesHeart-evil.png
+
+newmtl Eyes_Nere
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_Eyes-nere.png
+
+newmtl Eyes_Nere_Blank
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_EyesBlank-nere.png
+
+newmtl Eyes_Nere_DZ
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_EyesDZ-nere.png
+
+newmtl Eyes_Nere_Heart
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_EyesHeart-nere.png
+
+newmtl Eyes_Nere_Star
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_EyesStar-nere.png
+
+newmtl Eyes_Star
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_EyesStar.png
+
+newmtl Eyes_Star-Evil
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_EyesStar-evil.png
+
+newmtl NereFacev3r
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+
+newmtl NeuroFacev3r
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+
+newmtl Outline_Black
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl Outline_Skin
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl Stand
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl V3Accessory-Evil_Catstuff
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_Acce-evil.png
+
+newmtl V3AccessoryC
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_Acce.png
+
+newmtl V3AccessoryC-Evil
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_Acce-evil.png
+
+newmtl V3AccessoryC_Catstuff
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_Acce.png
+
+newmtl V3AccessoryC_Nere
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_Acce-nere.png
+
+newmtl V3Clothes
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_Clothes_C.png
+map_Ns textures/NRv3r_ClothesAll_Roughness.png
+
+newmtl V3Clothes-Evil
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_Clothes-Evil_C.png
+
+newmtl V3Clothes_Nere
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd textures/NRv3r_Clothes-nere_C.png
+map_Ns textures/NRv3r_ClothesAll_Roughness.png
+
+newmtl bodyv3
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd textures/NRv3r_Mainbody.png
+
+newmtl v3hair_release
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/NRv3r_Hair.png
+map_Ns textures/NRv3r_Hair_Roughness.png
+
+newmtl v3hair_release_nere
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/NRv3r_Hair-nere.png
+map_Ns textures/NRv3r_Hair_Roughness.png

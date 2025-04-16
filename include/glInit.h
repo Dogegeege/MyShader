@@ -45,8 +45,7 @@ std::optional<GLFWwindow*> glInit(const int screenWidth, const int screenHeight,
         return std::nullopt;
     }
 
-#ifdef DEBUG
-    #if MY_GLFW_CONTEXT_VERSION_MAJOR >= 4 && MY_GLFW_CONTEXT_VERSION_MINOR >= 3
+#if MY_GLFW_CONTEXT_VERSION_MAJOR >= 4 && MY_GLFW_CONTEXT_VERSION_MINOR >= 3
     // 启用调试输出
     std::cerr << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
 
@@ -54,7 +53,6 @@ std::optional<GLFWwindow*> glInit(const int screenWidth, const int screenHeight,
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
     glDebugMessageCallback(MessageCallback, nullptr);
-    #endif
 #endif
 
     return window;

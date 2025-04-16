@@ -16,8 +16,8 @@ constexpr float SPEED       = 2.5f;
 constexpr float SENSITIVITY = 0.1f;
 constexpr float ZOOM        = 45.0f;
 
-constexpr unsigned int SCR_WIDTH  = 800;
-constexpr unsigned int SCR_HEIGHT = 600;
+constexpr unsigned int SCR_WIDTH  = 1600;
+constexpr unsigned int SCR_HEIGHT = 900;
 
 }  // namespace
 // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL

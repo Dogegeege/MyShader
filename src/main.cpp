@@ -1,4 +1,5 @@
 #include <math.h>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -15,10 +16,33 @@
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 bool   rightMouseButtonPressed = false;  // 鼠标左键按下状态
 
+glm::mat4 model      = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
+glm::mat4 view       = camera.GetViewMatrix();
+glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+
 //!---------------------------------Callbaclk----------------------------------
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
+    // glViewport(0, 0, width, height);
+
+    // 固定宽高比
+    float aspectRatio = 16.0f / 9.0f;  // 假设宽高比为 16:9
+    int   viewportWidth, viewportHeight;
+
+    if (width / (float)height > aspectRatio) {
+        viewportWidth  = static_cast<int>(height * aspectRatio);
+        viewportHeight = height;
+    } else {
+        viewportWidth  = width;
+        viewportHeight = static_cast<int>(width / aspectRatio);
+    }
+
+    int viewportX = (width - viewportWidth) / 2;
+    int viewportY = (height - viewportHeight) / 2;
+
+    glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
+
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -71,40 +95,33 @@ int main() {
     IMGUI_CHECKVERSION();    // 检查 ImGui 版本
     ImGui::CreateContext();  // 创建 ImGui 上下文
     ImGuiIO& io = ImGui::GetIO();
-    (void)io;                                    // 获取 IO 对象
+    (void)io;  // 获取 IO 对象
+
+    // 这里是一些ImGui的拓展的设置
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+    // 中文的设置，记得将main.cpp的文件编码类型改为UTF-8
+    io.Fonts->AddFontFromFileTTF("C:\\\\Windows\\\\Fonts\\\\msyh.ttc", 30.f, NULL, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+
     ImGui::StyleColorsDark();                    // 设置暗色主题
     ImGui_ImplGlfw_InitForOpenGL(window, true);  // 初始化 GLFW 后端
     ImGui_ImplOpenGL3_Init("#version 330");      // 初始化 OpenGL3 后端
 
     //!---------------------------------顶点数据----------------------------------
 
-    std::shared_ptr<Shader> cubeShader     = std::make_shared<Shader>("../../assets/shader/cube.vsh", "../../assets/shader/cube.fsh");
-    std::shared_ptr<Shader> lightingShader = std::make_shared<Shader>("../../assets/shader/light.vsh", "../../assets/shader/light.fsh");
-    // std::shared_ptr<Shader> modelShader    = std::make_shared<Shader>("../src/shader/model.vsh", "../src/shader/model.fsh");
+    // std::shared_ptr<Shader> cubeShader    = std::make_shared<Shader>("../../assets/shader/cube.vsh", "../../assets/shader/cube.fsh");
+    // std::shared_ptr<Shader> lightingShade = std::make_shared<Shader>("../../assets/shader/light.vsh", "../../assets/shader/light.fsh");
+    // std::shared_ptr<Shader> modelShader = std::make_shared<Shader>("../../assets/shader/model.vsh", "../../assets/shader/model.fsh");
 
-    // Model neuro = Model("../model/vtuber-neuro-sama-v3/source/_unique_vertices.csv",
-    //                     "../model/vtuber-neuro-sama-v3/source/_indices.csv",  // 导入体模型
-    //                     "../model/vtuber-neuro-sama-v3/source/_prop.csv", 4);
-    Model cube = Model();
+    Shader modelShader("../../assets/shader/model.vsh", "../../assets/shader/model.fsh");
 
-    // VertexShaderLoader modelVertex(neuro);  // nero
+    // Model ourModel = Model("E:/Project/Learn_OpenGL/assets/model/backpack/backpack.obj");
+    // Model ourModel = Model("E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/Nurtwinsprevobj.obj");
 
-    VertexShaderLoader cubeVertex(cube);  // 立方体
-
-    VertexShaderLoader ligtingVertex(cube);  // 光源
-
-#ifndef USETEXURE
-    //!------------------------- 纹理-----------------------------
-
-    Texure diffuseMap("../../assets/texure/container2.png", 0);            // 纹理单元0
-    Texure specularMap("../../assets/texure/container2_specular.png", 1);  // 纹理单元1
-
-    cubeShader->use();  // 不要忘记在设置uniform变量之前激活着色器程序！
-
-    // 静态设置纹理
-    cubeShader->setInt("material.diffuse", 0);
-    // cubeShader->setInt("material.specular", 1);
-#endif
+    Model ourModel = Model("E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
 
     //!------------------------------变换---------------------------------------
     const glm::vec3 cubePositions[] = {glm::vec3(0.0f, 0.0f, 0.0f),     glm::vec3(2.0f, 5.0f, -15.0f), glm::vec3(-1.5f, -2.2f, -2.5f),
@@ -120,7 +137,9 @@ int main() {
     float deltaTime = 0.0f;  // time between current frame and last frame
     float lastFrame = 0.0f;
 
-    app::application appinfo(false, 0, 0.0f, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));  // 创建应用程序对象
+    app::application appinfo = app::application();  // 创建应用程序对象
+
+    // model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));  // translate it down so it's at the center of the scene
 
     while (glfwWindowShouldClose(window) == false) {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -129,96 +148,89 @@ int main() {
 
         processInput(window, deltaTime);  // IO响应
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        auto& bck = appinfo.backgroundColor;
+        glClearColor(bck.x, bck.y, bck.z, bck.w);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 model      = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        glm::mat4 view       = camera.GetViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        view = camera.GetViewMatrix();
 
-#ifdef MODEL
         //!--------------------------Model--------------------------------
-        model = glm::mat4(0.01f);
 
-        modelShader->use();
+        modelShader.use();
 
-        modelShader->setVec3("objectColor", 1.0f, 0.5f, 0.31f);  // 物体颜色
-        modelShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);    // 发光颜色
+        modelShader.setMat4("model", model);
+        modelShader.setMat4("view", view);
+        modelShader.setMat4("projection", projection);
 
-        modelShader->setMat4("model", glm::translate(model, cubePositions[0]));
-        modelShader->setMat4("view", view);
-        modelShader->setMat4("projection", projection);
+        //! 智能指针（需要改造）
+        ourModel.Draw(modelShader);
+        // //!--------------------------Cube--------------------------------
 
-        modelVertex.bindAndDrawElements();
-        modelVertex.UnbindVertexArray();
-#endif
-        //!--------------------------Cube--------------------------------
+        // cubeShader->use();  // 使用着色器程序
 
-        cubeShader->use();  // 使用着色器程序
+        // // 摄像机属性
+        // cubeShader->setMat4("model", model);
+        // cubeShader->setMat4("view", view);
+        // cubeShader->setMat4("projection", projection);
 
-        // 摄像机属性
-        cubeShader->setMat4("model", model);
-        cubeShader->setMat4("view", view);
-        cubeShader->setMat4("projection", projection);
+        // // 设置材质属性
+        // cubeShader->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        // cubeShader->setFloat("material.shininess", 32.0f);
 
-        // 设置材质属性
-        cubeShader->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-        cubeShader->setFloat("material.shininess", 32.0f);
+        // // 设置光源（对物体）属性
+        // cubeShader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        // cubeShader->setVec3("light.diffuse", appinfo.lightColor);  // 将光照调暗了一些以搭配场景
+        // cubeShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        // cubeShader->setVec3("light.position", lightPositions);           // 光源位置
+        // cubeShader->setFloat("light.intensity", appinfo.lightIntesity);  // 光源强度
 
-        // 设置光源（对物体）属性
-        cubeShader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-        cubeShader->setVec3("light.diffuse", appinfo.lightColor);  // 将光照调暗了一些以搭配场景
-        cubeShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        cubeShader->setVec3("light.position", lightPositions);           // 光源位置
-        cubeShader->setFloat("light.intensity", appinfo.lightIntesity);  // 光源强度
+        // cubeShader->setVec3("viewPos", camera.Position);  // 摄像机位置
 
-        cubeShader->setVec3("viewPos", camera.Position);  // 摄像机位置
+        // diffuseMap.acitVeTexure();
+        // specularMap.acitVeTexure();
 
-        diffuseMap.acitVeTexure();
-        specularMap.acitVeTexure();
+        // for (int i = 0; i < 10; i++) {
+        //     // glm::vec3 lightColor;
+        //     // lightColor.x = sin(glfwGetTime() * 2.0f);
+        //     // lightColor.y = sin(glfwGetTime() * 0.7f);
+        //     // lightColor.z = sin(glfwGetTime() * 1.3f);
 
-        for (int i = 0; i < 10; i++) {
-            // glm::vec3 lightColor;
-            // lightColor.x = sin(glfwGetTime() * 2.0f);
-            // lightColor.y = sin(glfwGetTime() * 0.7f);
-            // lightColor.z = sin(glfwGetTime() * 1.3f);
+        //     // glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);    // 降低影响
+        //     // glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);  // 很低的影响
 
-            // glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);    // 降低影响
-            // glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);  // 很低的影响
+        //     // cubeShader->setVec3("light.ambient", ambientColor);
+        //     // cubeShader->setVec3("light.diffuse", diffuseColor);
 
-            // cubeShader->setVec3("light.ambient", ambientColor);
-            // cubeShader->setVec3("light.diffuse", diffuseColor);
+        //     cubeShader->setMat4("model", glm::translate(model, cubePositions[i]));
 
-            cubeShader->setMat4("model", glm::translate(model, cubePositions[i]));
+        //     cubeVertex.bindAndDrawElements();
+        // }
+        // cubeVertex.UnbindVertexArray();
 
-            cubeVertex.bindAndDrawElements();
-        }
-        cubeVertex.UnbindVertexArray();
+        // //!---------------------------Light--------------------------------
 
-        //!---------------------------Light--------------------------------
+        // // 构造光源
+        // lightingShader->use();
 
-        // 构造光源
-        lightingShader->use();
+        // float radius = 2.0f;
 
-        float radius = 2.0f;
+        // lightPositions.y = cos(appinfo.lightPose * camera.MovementSpeed) * radius;
+        // lightPositions.z = sin(appinfo.lightPose * camera.MovementSpeed) * radius;
 
-        lightPositions.y = cos(appinfo.lightPose * camera.MovementSpeed) * radius;
-        lightPositions.z = sin(appinfo.lightPose * camera.MovementSpeed) * radius;
+        // model = glm::mat4(1.0f);
+        // model = glm::translate(model, lightPositions);
+        // model = glm::scale(model, glm::vec3(0.2f));  // a smaller cube
 
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPositions);
-        model = glm::scale(model, glm::vec3(0.2f));  // a smaller cube
+        // lightingShader->setMat4("model", glm::translate(model, lightPositions));  // 随便给个位置
+        // lightingShader->setMat4("view", view);
+        // lightingShader->setMat4("projection", projection);
 
-        lightingShader->setMat4("model", glm::translate(model, lightPositions));  // 随便给个位置
-        lightingShader->setMat4("view", view);
-        lightingShader->setMat4("projection", projection);
+        // lightingShader->setVec4("lightColor", appinfo.lightColor);
 
-        lightingShader->setVec4("lightColor", appinfo.lightColor);
+        // ligtingVertex.bindAndDrawElements();
 
-        ligtingVertex.bindAndDrawElements();
-
-        //!-------------------------------imgui-----------------------------------------
+        // //!-------------------------------imgui-----------------------------------------
 
         // 开始新的一帧
         ImGui_ImplOpenGL3_NewFrame();
@@ -226,8 +238,17 @@ int main() {
         ImGui::NewFrame();
 
         appinfo.Render();
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());  // 渲染 ImGui 数据
+
+        // 只需要渲染单页面内部ui不用以下设置，不过最好可以加上
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+            GLFWwindow* backup_current_context = glfwGetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backup_current_context);
+        }
 
         //!---------------------------------------------------------------------
         // 处理事件
@@ -236,8 +257,6 @@ int main() {
         // 交换缓冲
         glfwSwapBuffers(window);
     }
-
-    VertexShaderLoader::unBindBuffer();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

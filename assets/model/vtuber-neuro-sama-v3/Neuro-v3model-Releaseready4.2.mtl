@@ -1,0 +1,142 @@
+# Blender 4.4.0 MTL File: 'Neuro-v3model-Releaseready4.2.blend'
+# www.blender.org
+
+newmtl Emotes
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 3
+map_Kd E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_Emotes.png
+map_d E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_Emotes.png
+
+newmtl Eyes
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_Eyes.png
+
+newmtl Eyes_Blank
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 3
+map_Kd E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_EyesBlank.png
+map_d E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_EyesBlank.png
+
+newmtl Eyes_DZ
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_EyesDZ.png
+
+newmtl Eyes_Heart
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_EyesHeart.png
+
+newmtl Eyes_Star
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_EyesStar.png
+
+newmtl NeuroFacev3r
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_Face.png
+
+newmtl Outline_Black
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl Skin_Outline
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl V3AccessoryC
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_Acce.png
+
+newmtl V3AccessoryC_Catstuff
+Ns 0.516528
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_Acce.png
+
+newmtl V3Clothes
+Ka 0.090909 0.090909 0.090909
+Ks 0.345455 0.345455 0.345455
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_Clothes_C.png
+map_Ns E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_ClothesAll_Roughness.png
+
+newmtl bodyv3
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.704242 0.685728
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+
+newmtl v3hair_release
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_Hair.png
+map_Ns E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/NRv3r_Hair_Roughness.png

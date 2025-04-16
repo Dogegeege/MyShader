@@ -2,19 +2,26 @@
 
 #include <imgui.h>
 
+#include <glad/glad.h>
+
+#include <GLFW/glfw3.h>
+
 namespace app {
 
 class application {
    public:
-    application(bool drawLight, int cnt, float lightPose, ImVec4 lightColor)
-        : drawLight(drawLight), cnt(cnt), lightPose(lightPose), lightColor(lightColor) {
-        lightIntesity = 0.0f;
+    application() {
+        drawLight       = false;
+        cnt             = 0;
+        lightPose       = 0.0f;
+        backgroundColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+        lightIntesity   = 0.0f;
     }
 
     // Render 函数：负责绘制 ImGui 界面
     inline void Render() {
         // 开始一个新的 ImGui 窗口
-        ImGui::Begin("Hello,world");
+        ImGui::Begin("中文显示UTF-8");
         // 获取当前窗口的大小
         // ImVec2 windowSize = ImGui::GetIO().DisplaySize;
 
@@ -26,7 +33,7 @@ class application {
         ImGui::Text("This is a minimal ImGui application.");
         ImGui::Checkbox("DrawLigt", &drawLight);  // 显示一个复选框
         ImGui::SliderFloat("LightPosition", &lightPose, 0.0f, 5.0f);
-        ImGui::ColorEdit3("LightColor", (float*)&lightColor);  // 显示一个颜色编辑器
+        ImGui::ColorEdit3("LightColor", (float*)&backgroundColor);  // 显示一个颜色编辑器
 
         ImGui::SliderFloat("LightIntesity", &lightIntesity, 1.0f, 5.0f);
 
@@ -41,7 +48,7 @@ class application {
     int    cnt;
     float  lightPose;
     float  lightIntesity;
-    ImVec4 lightColor;
+    ImVec4 backgroundColor;
 };
 
 inline void init() {}
