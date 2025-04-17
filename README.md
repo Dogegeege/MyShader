@@ -8,7 +8,7 @@ Building Project
 To check out project together with all dependencies, be sure to use the
 `--recursive` flag when cloning the repository, i.e.
 ```bash
-$ git clone --recursive https://github.com/mmp/pbrt-v3/
+$ git clone --recursive https://github.com/Dogegeege/MyShader
 ```
 If you accidentally already cloned pbrt without this flag (or to update an
 project source tree after a new submodule has been added, run the following
