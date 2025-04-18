@@ -7,90 +7,22 @@
 #include "Application/application.hpp"
 
 #include "camera.h"
-#include "glInit.h"
 #include "model.h"
 #include "shader.h"
 #include "texure.h"
 #include "vertexShaderLoader.h"
+#include "windowrender.h"
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-bool   rightMouseButtonPressed = false;  // 鼠标左键按下状态
+Camera       camera(glm::vec3(0.0f, 0.0f, 3.0f));
+WindowRender windowRender(camera, "LearnOpenGL");
 
 glm::mat4 model      = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
 glm::mat4 view       = camera.GetViewMatrix();
-glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-
-//!---------------------------------Callbaclk----------------------------------
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    // glViewport(0, 0, width, height);
-
-    // 固定宽高比
-    float aspectRatio = 16.0f / 9.0f;  // 假设宽高比为 16:9
-    int   viewportWidth, viewportHeight;
-
-    if (width / (float)height > aspectRatio) {
-        viewportWidth  = static_cast<int>(height * aspectRatio);
-        viewportHeight = height;
-    } else {
-        viewportWidth  = width;
-        viewportHeight = static_cast<int>(width / aspectRatio);
-    }
-
-    int viewportX = (width - viewportWidth) / 2;
-    int viewportY = (height - viewportHeight) / 2;
-
-    glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
-
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
-}
-
-void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    if (rightMouseButtonPressed == true) { camera.ProcessMouseMovement(xpos, ypos); }
-}
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-    camera.ProcessMouseScroll(static_cast<float>(yoffset));
-}
-
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-    if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-        if (action == GLFW_PRESS) {
-            rightMouseButtonPressed = true;  // 鼠标左键按下
-        } else if (action == GLFW_RELEASE) {
-            rightMouseButtonPressed = false;  // 鼠标左键释放
-            camera.firstMouse       = true;   // 重置鼠标状态
-        }
-    }
-}
+glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f);
 
 //!-----------------------------------------------------------------
 
-void processInput(GLFWwindow* window, float deltaTime) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true);  // 按ESC退出
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) camera.ProcessKeyboard(UP, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) camera.ProcessKeyboard(DOWN, deltaTime);
-}
-
 int main() {
-    auto windowopt = glInit(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL");  // 初始化GLFW窗口
-    if (windowopt.has_value() == false) { return -1; }
-
-    auto window = windowopt.value();  // 获取窗口
-
-    // 注册回调参数
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);  // 调整窗口
-    glfwSetScrollCallback(window, scroll_callback);                     // 鼠标滚轮参数
-    glfwSetMouseButtonCallback(window, mouse_button_callback);          // 注册鼠标按键回调
-    glfwSetCursorPosCallback(window, mouse_callback);                   // 注册鼠标移动回调
-    // 启用鼠标监听
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  // 隐藏鼠标
-
     // 初始化 ImGui
     IMGUI_CHECKVERSION();    // 检查 ImGui 版本
     ImGui::CreateContext();  // 创建 ImGui 上下文
@@ -106,9 +38,9 @@ int main() {
     // 中文的设置，记得将main.cpp的文件编码类型改为UTF-8
     io.Fonts->AddFontFromFileTTF("C:\\\\Windows\\\\Fonts\\\\msyh.ttc", 30.f, NULL, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
 
-    ImGui::StyleColorsDark();                    // 设置暗色主题
-    ImGui_ImplGlfw_InitForOpenGL(window, true);  // 初始化 GLFW 后端
-    ImGui_ImplOpenGL3_Init("#version 330");      // 初始化 OpenGL3 后端
+    ImGui::StyleColorsDark();                                      // 设置暗色主题
+    ImGui_ImplGlfw_InitForOpenGL(windowRender.getWindow(), true);  // 初始化 GLFW 后端
+    ImGui_ImplOpenGL3_Init("#version 330");                        // 初始化 OpenGL3 后端
 
     //!---------------------------------顶点数据----------------------------------
 
@@ -141,19 +73,20 @@ int main() {
 
     // model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));  // translate it down so it's at the center of the scene
 
-    while (glfwWindowShouldClose(window) == false) {
+    while (glfwWindowShouldClose(windowRender.getWindow()) == false) {
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime          = currentFrame - lastFrame;
         lastFrame          = currentFrame;
 
-        processInput(window, deltaTime);  // IO响应
+        windowRender.processInput(deltaTime);  // IO响应
 
         auto& bck = appinfo.backgroundColor;
         glClearColor(bck.x, bck.y, bck.z, bck.w);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        view = camera.GetViewMatrix();
+        view       = camera.GetViewMatrix();
+        projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f);
 
         //!--------------------------Model--------------------------------
 
@@ -255,14 +188,13 @@ int main() {
         glfwPollEvents();
 
         // 交换缓冲
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(windowRender.getWindow());
     }
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    windowRender.~WindowRender();  // 显式写出
     return 0;
 }
