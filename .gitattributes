@@ -1,0 +1,5 @@
+CMakeLists.txt linguist-language=CMake
+CmakeLists.txt linguist-language=CMake
+*.cmake linguist-language=CMake
+*.Cmake linguist-language=CMake
+
