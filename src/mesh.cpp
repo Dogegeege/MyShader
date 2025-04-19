@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures)
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<std::shared_ptr<Texture2D>> textures)
     : vertices(vertices), indices(indices), textures(textures) {
     setupMesh();
 }
@@ -20,7 +20,7 @@ void Mesh::Draw(Shader& shader) {
         // 获取纹理序号（diffuse_textureN 中的 N）
 
         std::string number;
-        std::string name = textures[i].type;
+        std::string name = textures[i]->typeName;
         if (name == "texture_diffuse")
             number = std::to_string(diffuseNr++);  // 漫反射材质纹理
         else if (name == "texture_specular")
@@ -33,7 +33,7 @@ void Mesh::Draw(Shader& shader) {
         // 需要保证着色器内部格式统一
         //* 比如 material.texure_diffuse1
         shader.setUnsignedInt((name + number), i);
-        glBindTexture(GL_TEXTURE_2D, textures[i].id);
+        glBindTexture(GL_TEXTURE_2D, textures[i]->textureID);
     }
     // if (textures.empty() == true) std::cerr << "mssing textures  " << this->VAO << std::endl;
 

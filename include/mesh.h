@@ -14,11 +14,11 @@
 #include <GLFW/glfw3.h>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-#include <stb_image.h>
 #include <assimp/Importer.hpp>
 #include <glm/glm.hpp>
 
 #include "shader.h"
+#include "texture.h"
 
 #define MAX_BONE_INFLUENCE 4
 
@@ -42,26 +42,15 @@ struct Vertex {
     float m_Weights[MAX_BONE_INFLUENCE];  // weights from each bone
 };
 
-/**
- * @param id 纹理编号
- * @param type 纹理类型
- * @param path 纹理路径
- */
-struct Texture {
-    GLuint      id;
-    std::string type;
-    aiString    path;  // 储存纹理的路径用于与其它纹理进行比较
-};
-
 class Mesh {
    public:
-    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures);
+    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<std::shared_ptr<Texture2D>> textures);
     void Draw(Shader& shader);
 
     /*  网格数据  */
-    std::vector<Vertex>  vertices;
-    std::vector<GLuint>  indices;
-    std::vector<Texture> textures;
+    std::vector<Vertex>                     vertices;
+    std::vector<GLuint>                     indices;
+    std::vector<std::shared_ptr<Texture2D>> textures;
 
    private:
     void setupMesh();

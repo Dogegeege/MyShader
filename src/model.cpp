@@ -54,9 +54,9 @@ void Model::processNode(aiNode* node, const aiScene* scene) {
 }
 
 Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
-    std::vector<Vertex>  vertices;
-    std::vector<GLuint>  indices;
-    std::vector<Texture> textures;
+    std::vector<Vertex>                     vertices;
+    std::vector<GLuint>                     indices;
+    std::vector<std::shared_ptr<Texture2D>> textures;
 
     for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
         Vertex vertex;
@@ -120,26 +120,26 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     //           << scene->mMaterials[mesh->mMaterialIndex] << std::endl;
 
     // 漫反射材质纹理
-    std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+    auto diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
     // 镜面反射材质纹理
-    std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+    auto specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
     // 法线纹理
-    std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+    auto normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
     textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
     // 高度纹理
-    std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+    auto heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
     return Mesh(vertices, indices, textures);
 }
 
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
-    std::vector<Texture> textures;
+std::vector<std::shared_ptr<Texture2D>> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
+    std::vector<std::shared_ptr<Texture2D>> textures;
 
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString str;  // 纹理路径
@@ -147,21 +147,20 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 
         bool skip = false;
 
-        //! 优化建议,开 set
+        //! 优化建议,开 set或者哈希
         for (unsigned int j = 0; j < textures_loaded.size(); j++) {
             // 如果在已有材质中找到存在的材质，则退出
-            if (std::strcmp(textures_loaded[j].path.data, str.C_Str()) == 0) {
+            if (textures_loaded[j]->path.data() == str.C_Str()) {
                 textures.push_back(textures_loaded[j]);
                 skip = true;
                 break;
             }
         }
         if (skip == false) {  // 如果纹理还没有被加载，则加载它
-            Texture texture;
+            auto filePath = this->directory + '/' + std::string(str.C_Str());
 
-            texture.id   = TextureFromFile(str.C_Str(), directory, false);
-            texture.type = typeName;
-            texture.path = str.C_Str();
+            auto texture = std::make_shared<Texture2D>(filePath, typeName);
+
             textures.push_back(texture);
             textures_loaded.push_back(texture);  // 添加到已加载的纹理中
         }
@@ -202,7 +201,7 @@ GLuint TextureFromFile(const char* path, const std::string& directory, bool gamm
 
         stbi_image_free(data);
     } else {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
+        std::cerr << "Texture failed to load at path: " << path << std::endl;
         stbi_image_free(data);
     }
 

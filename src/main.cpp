@@ -9,8 +9,7 @@
 #include "camera.h"
 #include "model.h"
 #include "shader.h"
-#include "texure.h"
-#include "vertexShaderLoader.h"
+#include "texture.h"
 #include "windowrender.h"
 
 Camera       camera(glm::vec3(0.0f, 0.0f, 3.0f));
