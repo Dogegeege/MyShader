@@ -4,7 +4,7 @@
  * @brief 对每一个 `mesh` 进行绘制
  */
 void Model::Draw(Shader& shader) {
-    for (unsigned int i = 0; i < meshes.size(); i++) meshes[i].Draw(shader);
+    for (unsigned int i = 0; i < meshes.size(); i++) meshes[i]->Draw(shader);
 }
 
 void Model::loadModel(const std::string& path) {
@@ -53,7 +53,7 @@ void Model::processNode(aiNode* node, const aiScene* scene) {
     for (unsigned int i = 0; i < node->mNumChildren; i++) { processNode(node->mChildren[i], scene); }
 }
 
-Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
+std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     std::vector<Vertex>                     vertices;
     std::vector<GLuint>                     indices;
     std::vector<std::shared_ptr<Texture2D>> textures;
@@ -135,7 +135,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     auto heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
-    return Mesh(vertices, indices, textures);
+    return std::make_shared<Mesh>(vertices, indices, textures);
 }
 
 std::vector<std::shared_ptr<Texture2D>> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
@@ -166,44 +166,4 @@ std::vector<std::shared_ptr<Texture2D>> Model::loadMaterialTextures(aiMaterial* 
         }
     }
     return textures;
-}
-
-GLuint TextureFromFile(const char* path, const std::string& directory, bool gamma) {
-    std::string filename = std::string(path);
-    filename             = directory + '/' + filename;
-
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-
-    // stbi_set_flip_vertically_on_load(true);
-
-    // std::cout << "textureID :" << textureID << " Path  ->  " << filename << std::endl;
-
-    int            width, height, nrComponents;
-    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-    if (data != nullptr) {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
-    } else {
-        std::cerr << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
-    }
-
-    return textureID;
 }
