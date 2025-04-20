@@ -50,8 +50,6 @@ int main() {
     float deltaTime = 0.0f;  // time between current frame and last frame
     float lastFrame = 0.0f;
 
-    app::application appinfo = app::application();  // 创建应用程序对象
-
     // model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));  // translate it down so it's at the center of the scene
 
     while (glfwWindowShouldClose(windowRender.getWindow()) == false) {
@@ -61,7 +59,7 @@ int main() {
 
         windowRender.processInput(deltaTime);  // IO响应
 
-        auto& bck = appinfo.backgroundColor;
+        auto& bck = ui.backgroundColor;
         glClearColor(bck.x, bck.y, bck.z, bck.w);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
