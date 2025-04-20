@@ -48,7 +48,7 @@ add_subdirectory(3rdParty)
 #头文件
 file(GLOB PROJECT_HEADERS
     include
-    include/Application
+    #include/Application
 )
 
 # 第三方库头文件
@@ -80,7 +80,7 @@ file(GLOB PROJECT_SHADERS
     assets/shader/*.fsh
 
     assets/shader/*.geom
-    assets/shader/*.geom
+    #assets/shader/*.geom
     #....
 )
 

@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "Application/application.hpp"
+#include "UIrender.h"
 
 #include "camera.h"
 #include "model.h"
@@ -22,25 +22,7 @@ glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), camera.aspect
 //!-----------------------------------------------------------------
 
 int main() {
-    // 初始化 ImGui
-    IMGUI_CHECKVERSION();    // 检查 ImGui 版本
-    ImGui::CreateContext();  // 创建 ImGui 上下文
-    ImGuiIO& io = ImGui::GetIO();
-    (void)io;  // 获取 IO 对象
-
-    // 这里是一些ImGui的拓展的设置
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-
-    // 中文的设置，记得将main.cpp的文件编码类型改为UTF-8
-    io.Fonts->AddFontFromFileTTF("C:\\\\Windows\\\\Fonts\\\\msyh.ttc", 30.f, NULL, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
-
-    ImGui::StyleColorsDark();                                      // 设置暗色主题
-    ImGui_ImplGlfw_InitForOpenGL(windowRender.getWindow(), true);  // 初始化 GLFW 后端
-    ImGui_ImplOpenGL3_Init("#version 330");                        // 初始化 OpenGL3 后端
-
+    UIRender ui(windowRender);
     //!---------------------------------顶点数据----------------------------------
 
     // std::shared_ptr<Shader> cubeShader    = std::make_shared<Shader>("../../assets/shader/cube.vsh", "../../assets/shader/cube.fsh");
@@ -164,23 +146,7 @@ int main() {
 
         // //!-------------------------------imgui-----------------------------------------
 
-        // 开始新的一帧
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        appinfo.Render();
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());  // 渲染 ImGui 数据
-
-        // 只需要渲染单页面内部ui不用以下设置，不过最好可以加上
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-            GLFWwindow* backup_current_context = glfwGetCurrentContext();
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-            glfwMakeContextCurrent(backup_current_context);
-        }
+        ui.RenderUI();
 
         //!---------------------------------------------------------------------
         // 处理事件
