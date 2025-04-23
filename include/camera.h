@@ -16,8 +16,8 @@ constexpr float SPEED       = 2.5f;
 constexpr float SENSITIVITY = 0.1f;
 constexpr float ZOOM        = 45.0f;
 
-constexpr float SCR_WIDTH  = 1280.0f;
-constexpr float SCR_HEIGHT = 720.0f;
+constexpr int SCR_WIDTH  = 1280;
+constexpr int SCR_HEIGHT = 720;
 
 }  // namespace
 

@@ -64,6 +64,14 @@ int main() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        model = glm::translate(glm::mat4(1.0f), ui.translate);
+
+        glm::quat quatX = glm::angleAxis(ui.rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));  // X 轴旋转四元数
+        glm::quat quatY = glm::angleAxis(ui.rotate.y, glm::vec3(0.0f, 1.0f, 0.0f));  // Y 轴旋转四元数
+        glm::quat quatZ = glm::angleAxis(ui.rotate.z, glm::vec3(0.0f, 0.0f, 1.0f));  // Z 轴旋转四元数
+
+        model *= glm::mat4_cast(quatZ * quatY * quatX);
+
         view       = camera.GetViewMatrix();
         projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f);
 
@@ -75,9 +83,8 @@ int main() {
         modelShader.setMat4("view", view);
         modelShader.setMat4("projection", projection);
 
-        //! 智能指针（需要改造）
         ourModel.Draw(modelShader);
-        // //!--------------------------Cube--------------------------------
+        //!--------------------------Cube--------------------------------
 
         // cubeShader->use();  // 使用着色器程序
 
@@ -120,7 +127,7 @@ int main() {
         // }
         // cubeVertex.UnbindVertexArray();
 
-        // //!---------------------------Light--------------------------------
+        //!---------------------------Light--------------------------------
 
         // // 构造光源
         // lightingShader->use();
@@ -142,13 +149,14 @@ int main() {
 
         // ligtingVertex.bindAndDrawElements();
 
-        // //!-------------------------------imgui-----------------------------------------
+        //!-------------------------------imgui-----------------------------------------
 
         ui.RenderUI();
 
         //!---------------------------------------------------------------------
         // 处理事件
         glfwPollEvents();
+        // if (ui.GetMainShouldClose()) { glfwSetWindowShouldClose(windowRender.getWindow(), GLFW_TRUE); }
 
         // 交换缓冲
         glfwSwapBuffers(windowRender.getWindow());

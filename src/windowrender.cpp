@@ -70,12 +70,20 @@ WindowRender::WindowRender(Camera& camera, std::string name) : windowName(name),
     windowCameraMap.insert({window, &camera});
 }
 
+inline void WindowRender::GetScreenSize(int& width, int& height) {
+    GLFWmonitor*       primaryMonitor = glfwGetPrimaryMonitor();  // 获取主显示器
+    const GLFWvidmode* mode           = glfwGetVideoMode(primaryMonitor);
+    width                             = mode->width;
+    height                            = mode->height;
+}
+
 GLFWwindow* WindowRender::InitWindow() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, MY_GLFW_CONTEXT_VERSION_MAJOR);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, MY_GLFW_CONTEXT_VERSION_MINOR);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);  // 启用透明窗口（需系统支持）
+    // glfwWindowHint(GLFW_DECORATED, GL_FALSE);  // 无边框
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif

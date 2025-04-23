@@ -11,7 +11,7 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& up)
       pitch(PITCH),
       position(position),
       worldUp(up),
-      aspectRatio(SCR_WIDTH / SCR_HEIGHT) {
+      aspectRatio(static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT)) {
     firstMouse              = true;
     rightMouseButtonPressed = false;
     UpdateCameraVectors();

@@ -21,8 +21,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
-std::optional<GLFWwindow*> glInit(const int screenWidth, const int screenHeight, const char* title);
-
 class WindowRender {
    public:
     WindowRender(Camera& camera, std::string name);
@@ -30,14 +28,15 @@ class WindowRender {
     void processInput(float deltaTime);
 
     inline GLFWwindow* getWindow() { return window; }
+    inline void        GetScreenSize(int& width, int& height);
 
     virtual ~WindowRender() {
         glfwDestroyWindow(window);
         glfwTerminate();
     };
 
-    float       screenWidth;
-    float       screenHeight;
+    int         screenWidth;
+    int         screenHeight;
     std::string windowName;
 
     static std::map<GLFWwindow*, Camera*> windowCameraMap;  // 静态映射表,用于回调函数
