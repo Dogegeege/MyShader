@@ -116,17 +116,6 @@ class UIRender {
             ImGui::EndMenuBar();
         }
 
-        // // 显示一段简单的文本
-        // ImGui::Text("This is a minimal ImGui application.");
-        // ImGui::Checkbox("DrawLigt", &drawLight);  // 显示一个复选框
-        // ImGui::SliderFloat("LightPosition", &lightPose, 0.0f, 5.0f);
-        // ImGui::ColorEdit3("LightColor", (float*)&backgroundColor);  // 显示一个颜色编辑器
-
-        // ImGui::SliderFloat("LightIntesity", &lightIntesity, 1.0f, 5.0f);
-
-        // if (ImGui::Button("TestButton")) cnt++;
-        // ImGui::SameLine();  // 显示在同一行
-
         /**添加自己的窗口**/
 
         ShowTreeView();
@@ -143,8 +132,9 @@ class UIRender {
         ImGui::SetNextWindowClass(&window_class);
     }
 
-    int       FirstIdx     = 0;  // 一级索引
-    int       SecondIdx    = 0;  // 二级索引
+    int FirstIdx  = 0;  // 一级索引
+    int SecondIdx = 0;  // 二级索引
+
     char      text[3][64]  = {"0", "0", "0"};
     char      text1[3][64] = {"0", "0", "0"};
     glm::vec3 translate    = glm::vec3(0.0f);
@@ -177,28 +167,32 @@ class UIRender {
         }
         if (ImGui::TreeNode("物体")) {
             if (ImGui::TreeNode("变换")) {
-                ImGui::Text("位置 ");
+                ImGui::SeparatorText("位置 ");
 
-                ImGui::InputText("X", text[0], IM_ARRAYSIZE(text[0]), ImGuiInputTextFlags_CharsDecimal);
-                GetNumeric(text[0], translate.x);
-                ImGui::InputText("Y", text[1], IM_ARRAYSIZE(text[1]), ImGuiInputTextFlags_CharsDecimal);
-                GetNumeric(text[1], translate.y);
-                ImGui::InputText("Z", text[2], IM_ARRAYSIZE(text[2]), ImGuiInputTextFlags_CharsDecimal);
-                GetNumeric(text[2], translate.z);
-                std::cout << translate.x << " " << translate.y << " " << translate.z << std::endl;
+                ImGui::Text("X");
+                ImGui::SameLine();
+                ImGui::InputFloat("##TRANSLATE_X", &translate.x, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
+                ImGui::Text("Y");
+                ImGui::SameLine();
+                ImGui::InputFloat("##TRANSLATE_Y", &translate.y, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
+                ImGui::Text("Z");
+                ImGui::SameLine();
+                ImGui::InputFloat("##TRANSLATE_Z", &translate.z, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
 
-                ImGui::Text("旋转");
-                ImGui::AlignTextToFramePadding();
-                ImGui::InputText("X1", text1[0], IM_ARRAYSIZE(text1[0]), ImGuiInputTextFlags_CharsDecimal);
-                GetNumeric(text1[0], rotate.x);
-                ImGui::InputText("Y1", text1[1], IM_ARRAYSIZE(text1[1]), ImGuiInputTextFlags_CharsDecimal);
-                GetNumeric(text1[1], rotate.y);
-                ImGui::InputText("Z1", text1[2], IM_ARRAYSIZE(text1[2]), ImGuiInputTextFlags_CharsDecimal);
-                GetNumeric(text1[2], rotate.z);
+                ImGui::SeparatorText("旋转");
+                ImGui::Text("X");
+                ImGui::SameLine();
+                ImGui::InputFloat("##ROTATE_X", &rotate.x, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
+                ImGui::Text("Y");
+                ImGui::SameLine();
+                ImGui::InputFloat("##ROTATE_Y", &rotate.y, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
+                ImGui::Text("Z");
+                ImGui::SameLine();
+                ImGui::InputFloat("##ROTATE_Z", &rotate.z, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
+
                 ImGui::TreePop();
-                std::cout << rotate.x << " " << rotate.y << " " << rotate.z << std::endl;
             }
-            if (ImGui::TreeNode("旋转")) { ImGui::TreePop(); }
+            if (ImGui::TreeNode("Other")) { ImGui::TreePop(); }
             ImGui::TreePop();
         }
         ImGui::End();
@@ -296,9 +290,9 @@ class UIRender {
         dockspace_flags |= ImGuiDockNodeFlags_AutoHideTabBar;
 
         this->MainRender();
-        // ImGui::ShowAboutWindow();
-        // ImGui::ShowDebugLogWindow();
-        // ImGui::ShowDemoWindow();
+        //   ImGui::ShowAboutWindow();
+        //   ImGui::ShowDebugLogWindow();
+        ImGui::ShowDemoWindow();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());  // 渲染 ImGui 数据
