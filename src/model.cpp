@@ -7,8 +7,9 @@ Model::Model(const std::string& path) {
 /**
  * @brief 对每一个 `mesh` 进行绘制
  * @param shader 选择对模型渲染的着色器
+ *
  */
-void Model::Draw(Shader& shader) {
+void Model::ModelDraw(Shader& shader) {
     for (unsigned int i = 0; i < meshes.size(); i++) meshes[i]->Draw(shader);
 }
 

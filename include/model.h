@@ -1,13 +1,15 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <map>
+
 #include "mesh.h"
-#include "texture.h"
 
 class Model {
    public:
     Model(const std::string& path);
-    void Draw(Shader& shader);
+
+    void ModelDraw(Shader& shader);
 
    private:
     void                                    loadModel(const std::string& path);
@@ -21,5 +23,7 @@ class Model {
     std::vector<std::shared_ptr<Texture2D>> textures_loaded;  // 存储所有已知纹理，保证只加载一次
     bool                                    gammaCorrection;
 };
+
+static std::map<std::string, std::shared_ptr<Model>> LoadedModel;
 
 #endif

@@ -23,7 +23,8 @@
 #define MAX_BONE_INFLUENCE 4
 
 /**
- * @brief 介于C++结构体的特性,下列元素的内存地址是连续存放的，当它读入Buffer时,每个顶点的元素都会依次读入
+ * @brief
+ * 介于C++结构体的特性,下列元素的内存地址是连续存放的，当它读入Buffer时,每个顶点的元素都会依次读入
  * @param Position 顶点坐标
  * @param Normal 法线方向
  * @param TexCoords UV坐标
@@ -37,7 +38,8 @@ struct Vertex {
     glm::vec3 Tangent;    // tangent
     glm::vec3 Bitangent;  // bitangent
 
-    int m_BoneIDs[MAX_BONE_INFLUENCE];  // bone indexes which will influence this vertex
+    int m_BoneIDs[MAX_BONE_INFLUENCE];  // bone indexes which will influence this
+                                        // vertex
 
     float m_Weights[MAX_BONE_INFLUENCE];  // weights from each bone
 };

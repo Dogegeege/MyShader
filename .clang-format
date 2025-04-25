@@ -1,0 +1,11 @@
+BasedOnStyle: Chromium
+IndentWidth: 4
+ColumnLimit: 150
+IndentPPDirectives: BeforeHash
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+AlignConsecutiveDeclarations: AcrossComments
+AlignConsecutiveAssignments: AcrossComments
+AlignConsecutiveMacros: AcrossComments
+AllowShortBlocksOnASingleLine:  true
+AllowShortCaseLabelsOnASingleLine:  true 

@@ -65,13 +65,13 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         model = glm::translate(glm::mat4(1.0f), ui.translate);
+        model = glm::scale(model, glm::vec3(ui.scale, ui.scale, ui.scale));
 
         glm::quat quatX = glm::angleAxis(ui.rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));  // X 轴旋转四元数
         glm::quat quatY = glm::angleAxis(ui.rotate.y, glm::vec3(0.0f, 1.0f, 0.0f));  // Y 轴旋转四元数
         glm::quat quatZ = glm::angleAxis(ui.rotate.z, glm::vec3(0.0f, 0.0f, 1.0f));  // Z 轴旋转四元数
 
         model *= glm::mat4_cast(quatZ * quatY * quatX);
-
         view       = camera.GetViewMatrix();
         projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f);
 
@@ -83,7 +83,7 @@ int main() {
         modelShader.setMat4("view", view);
         modelShader.setMat4("projection", projection);
 
-        ourModel.Draw(modelShader);
+        ourModel.ModelDraw(modelShader);
         //!--------------------------Cube--------------------------------
 
         // cubeShader->use();  // 使用着色器程序

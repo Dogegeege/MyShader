@@ -120,7 +120,7 @@ class UIRender {
 
         ShowTreeView();
         ShowMainView();
-
+        ShowModelView();
         ImGui::End();
     }
 
@@ -139,6 +139,7 @@ class UIRender {
     char      text1[3][64] = {"0", "0", "0"};
     glm::vec3 translate    = glm::vec3(0.0f);
     glm::vec3 rotate       = glm::vec3(0.0f);  // 角度制
+    float     scale        = 1.0f;
 
     // 导航页面
     void ShowTreeView() {
@@ -189,6 +190,11 @@ class UIRender {
                 ImGui::Text("Z");
                 ImGui::SameLine();
                 ImGui::InputFloat("##ROTATE_Z", &rotate.z, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
+
+                ImGui::SeparatorText("缩放");
+                ImGui::Text("scale");
+                ImGui::SameLine();
+                ImGui::DragFloat("##SCALE", &scale, 0.01f, 0.001f, 100.0f, "%.3f");
 
                 ImGui::TreePop();
             }
@@ -241,6 +247,12 @@ class UIRender {
             }
             ImGui::EndTable();
         }
+    }
+
+    void ShowModelView() {
+        HideTabBar();
+        ImGui::Begin("模型");
+        ImGui::End();
     }
 
     void ShowPageView1() {
