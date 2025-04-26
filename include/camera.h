@@ -24,7 +24,7 @@ constexpr int SCR_HEIGHT = 720;
 
 /**
  *
-` */
+ */
 class Camera {
    public:
     Camera(const glm::vec3& position = glm::vec3(0.0f, 0.0f, 0.0f), const glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f));
@@ -44,6 +44,7 @@ class Camera {
     float aspectRatio;       // 宽高比
 
     bool rightMouseButtonPressed;
+    bool middleMouseButtonPressed;
     bool firstMouse;
 
    private:

@@ -47,11 +47,17 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             camera->firstMouse              = true;   // 重置鼠标状态
         }
     }
+    if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+        if (action == GLFW_PRESS)
+            camera->middleMouseButtonPressed = true;
+        else
+            camera->middleMouseButtonPressed = false;
+    }
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     auto camera = WindowRender::windowCameraMap[window];
-    camera->ProcessMouseScroll(static_cast<float>(yoffset));
+    if (camera->middleMouseButtonPressed == true) camera->ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
 void WindowRender::processInput(float deltaTime) {

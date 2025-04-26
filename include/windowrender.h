@@ -31,6 +31,7 @@ class WindowRender {
     inline void        GetScreenSize(int& width, int& height);
 
     virtual ~WindowRender() {
+        windowCameraMap.erase(window);
         glfwDestroyWindow(window);
         glfwTerminate();
     };

@@ -1,7 +1,12 @@
 #include "model.h"
 
+std::map<std::string, std::shared_ptr<Model>> Model::LoadedModel;
+//------------------------------------------------------------------------
+
 Model::Model(const std::string& path) {
+    name = path.substr(path.find_last_of('/') + 1, path.size());
     loadModel(path);
+    LoadedModel.insert({name, std::make_shared<Model>(*this)});
 }
 
 /**
@@ -148,7 +153,7 @@ std::vector<std::shared_ptr<Texture2D>> Model::loadMaterialTextures(aiMaterial* 
     std::vector<std::shared_ptr<Texture2D>> textures;
 
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
-        aiString str;  // 纹理路径
+        aiString str;  // 纹理名(比如NRv3r_Acce.png)
         mat->GetTexture(type, i, &str);
 
         bool skip = false;
@@ -164,8 +169,7 @@ std::vector<std::shared_ptr<Texture2D>> Model::loadMaterialTextures(aiMaterial* 
         }
         if (skip == false) {  // 如果纹理还没有被加载，则加载它
             auto filePath = this->directory + '/' + std::string(str.C_Str());
-
-            auto texture = std::make_shared<Texture2D>(filePath, typeName);
+            auto texture  = std::make_shared<Texture2D>(filePath, typeName);
 
             textures.push_back(texture);
             textures_loaded.push_back(texture);  // 添加到已加载的纹理中

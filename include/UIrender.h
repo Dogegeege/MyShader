@@ -1,6 +1,8 @@
 #ifndef UIRENDER_H
 #define UIRENDER_H
 
+#include <memory>
+
 #include <glad/glad.h>
 
 #include <backends/imgui_impl_glfw.h>
@@ -10,6 +12,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include "model.h"
 #include "windowrender.h"
 
 class UIRender {
@@ -87,7 +90,7 @@ class UIRender {
                     dockspace_flags ^= ImGuiDockNodeFlags_NoDockingInCentralNode;
                 }
 
-                if (ImGui::MenuItem("标志:自动隐藏选项卡栏(AutoHideTabBar)", "", (dockspace_flags & ImGuiDockNodeFlags_AutoHideTabBar) != 0, false)) {
+                if (ImGui::MenuItem("标志:自动隐藏选项卡栏(AutoHideTabBar)", "", (dockspace_flags & ImGuiDockNodeFlags_AutoHideTabBar) != 0)) {
                     // 当停靠节点内仅有一个选项卡时，自动隐藏选项卡栏；当存在多个选项卡时，自动显示选项卡栏。
                     dockspace_flags ^= ImGuiDockNodeFlags_AutoHideTabBar;
                 }
@@ -121,6 +124,7 @@ class UIRender {
         ShowTreeView();
         ShowMainView();
         ShowModelView();
+
         ImGui::End();
     }
 
@@ -135,11 +139,9 @@ class UIRender {
     int FirstIdx  = 0;  // 一级索引
     int SecondIdx = 0;  // 二级索引
 
-    char      text[3][64]  = {"0", "0", "0"};
-    char      text1[3][64] = {"0", "0", "0"};
-    glm::vec3 translate    = glm::vec3(0.0f);
-    glm::vec3 rotate       = glm::vec3(0.0f);  // 角度制
-    float     scale        = 1.0f;
+    glm::vec3 translate = glm::vec3(0.0f);
+    glm::vec3 rotate    = glm::vec3(0.0f);  // 角度制
+    float     scale     = 1.0f;
 
     // 导航页面
     void ShowTreeView() {
@@ -250,8 +252,14 @@ class UIRender {
     }
 
     void ShowModelView() {
-        HideTabBar();
-        ImGui::Begin("模型");
+        // HideTabBar();
+        ImGui::Begin("场景集合");
+        if (ImGui::TreeNode("模型")) {
+            for (auto [i, j] : Model::LoadedModel) {
+                if (ImGui::TreeNode(i.c_str())) { ImGui::TreePop(); }
+            }
+            ImGui::TreePop();
+        }
         ImGui::End();
     }
 
@@ -299,7 +307,7 @@ class UIRender {
         // 停靠窗口接收参数标志位
         dockspace_flags |= ImGuiDockNodeFlags_None;
         dockspace_flags |= ImGuiDockNodeFlags_PassthruCentralNode;
-        dockspace_flags |= ImGuiDockNodeFlags_AutoHideTabBar;
+        // dockspace_flags |= ImGuiDockNodeFlags_AutoHideTabBar;
 
         this->MainRender();
         //   ImGui::ShowAboutWindow();
