@@ -84,6 +84,7 @@ int main() {
         modelShader.setMat4("projection", projection);
 
         ourModel.ModelDraw(modelShader);
+
         //!--------------------------Cube--------------------------------
 
         // cubeShader->use();  // 使用着色器程序
