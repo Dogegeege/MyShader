@@ -19,12 +19,6 @@ class UIRender {
    public:
     UIRender(WindowRender& windowRender) : windowRender(windowRender) { UIInit(); }
 
-    bool   drawLight       = false;
-    int    cnt             = 0;
-    float  lightPose       = 0.0f;
-    float  lightIntesity   = 0.0f;
-    ImVec4 backgroundColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-
     void MainRender() {
         if (opt_fullscreen == true) {
             const ImGuiViewport* viewport = ImGui::GetMainViewport();

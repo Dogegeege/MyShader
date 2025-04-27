@@ -59,8 +59,7 @@ int main() {
 
         windowRender.processInput(deltaTime);  // IO响应
 
-        auto& bck = ui.backgroundColor;
-        glClearColor(bck.x, bck.y, bck.z, bck.w);
+        glClearColor(63, 63, 63, 1);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
