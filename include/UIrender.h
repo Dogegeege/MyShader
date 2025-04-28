@@ -251,6 +251,8 @@ class UIRender {
         }
     }
 
+    bool isZBufferPreview = false;
+
     void ShowModelView() {
         // HideTabBar();
         ImGui::Begin("场景集合");
@@ -260,6 +262,8 @@ class UIRender {
             }
             ImGui::TreePop();
         }
+
+        ImGui::Checkbox("Z-buffer预览", &isZBufferPreview);
         ImGui::End();
     }
 

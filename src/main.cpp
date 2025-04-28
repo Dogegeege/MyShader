@@ -34,7 +34,7 @@ int main() {
     // Model ourModel = Model("E:/Project/Learn_OpenGL/assets/model/backpack/backpack.obj");
     // Model ourModel = Model("E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/Nurtwinsprevobj.obj");
 
-    Model ourModel = Model("E:/Project/Learn_OpenGL/assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
+    Model ourModel = Model("../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
 
     //!------------------------------变换---------------------------------------
     const glm::vec3 cubePositions[] = {glm::vec3(0.0f, 0.0f, 0.0f),     glm::vec3(2.0f, 5.0f, -15.0f), glm::vec3(-1.5f, -2.2f, -2.5f),
@@ -82,6 +82,8 @@ int main() {
         modelShader.setMat4("model", model);
         modelShader.setMat4("view", view);
         modelShader.setMat4("projection", projection);
+
+        modelShader.setBool("isZBufferPreview", ui.isZBufferPreview);
 
         ourModel.ModelDraw(modelShader);
         //!--------------------------Cube--------------------------------
