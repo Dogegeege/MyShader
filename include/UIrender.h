@@ -147,7 +147,7 @@ class UIRender {
     void ShowTreeView() {
         HideTabBar();
         ImGui::Begin("导航窗口");
-        if (ImGui::TreeNode("功能选项")) {
+        if (ImGui::TreeNodeEx("功能选项", node_flags_outer)) {
             for (int i = 0; i < 5; i++) {
                 if (i == 0) ImGui::SetNextItemOpen(true, ImGuiCond_Once);
                 if (ImGui::TreeNode((void*)(intptr_t)i, "功能 %d", i)) {
@@ -168,8 +168,8 @@ class UIRender {
             }
             ImGui::TreePop();
         }
-        if (ImGui::TreeNode("物体")) {
-            if (ImGui::TreeNode("变换")) {
+        if (ImGui::TreeNodeEx("物体", node_flags_outer)) {
+            if (ImGui::TreeNodeEx("变换", node_flags_inner)) {
                 ImGui::SeparatorText("位置 ");
 
                 ImGui::Text("X");
@@ -200,7 +200,7 @@ class UIRender {
 
                 ImGui::TreePop();
             }
-            if (ImGui::TreeNode("Other")) { ImGui::TreePop(); }
+            if (ImGui::TreeNodeEx("Other", node_flags_inner)) { ImGui::TreePop(); }
             ImGui::TreePop();
         }
         ImGui::End();
@@ -256,9 +256,25 @@ class UIRender {
     void ShowModelView() {
         // HideTabBar();
         ImGui::Begin("场景集合");
-        if (ImGui::TreeNode("模型")) {
+        if (ImGui::TreeNodeEx("模型", node_flags_outer)) {
+            //! 此处技术未学到 关键词 FBO 存储多个模型实例，每个模型分配唯一整数 ID，每个模型存储独立变换矩阵...
+            //! 以及点击选中的效果
             for (auto [i, j] : Model::LoadedModel) {
-                if (ImGui::TreeNode(i.c_str())) { ImGui::TreePop(); }
+                if (ImGui::TreeNodeEx(i.c_str(), node_flags_selected)) {
+                    if (ImGui::IsItemClicked()) {
+                        // if (isSelected == false) {
+                        //     SelectedModel.insert({i, j});
+                        //     isSelected = true;
+                        // } else {
+                        //     SelectedModel.erase(i);
+                        //     isSelected = false;
+                        // }
+
+                        std::cout << "selected" << std::endl;
+                    }
+
+                    ImGui::TreePop();
+                }
             }
             ImGui::TreePop();
         }
@@ -313,6 +329,10 @@ class UIRender {
         dockspace_flags |= ImGuiDockNodeFlags_PassthruCentralNode;
         // dockspace_flags |= ImGuiDockNodeFlags_AutoHideTabBar;
 
+        node_flags_inner = static_cast<ImGuiTreeNodeFlags_>(ImGuiTreeNodeFlags_DrawLinesFull);
+        node_flags_outer = static_cast<ImGuiTreeNodeFlags_>(ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DrawLinesFull);
+        node_flags_selected =
+            static_cast<ImGuiTreeNodeFlags_>(ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_DrawLinesFull);
         this->MainRender();
         //   ImGui::ShowAboutWindow();
         //   ImGui::ShowDebugLogWindow();
@@ -330,11 +350,14 @@ class UIRender {
         }
     }
 
-    bool               p_open          = true;                     // *使用窗口关闭功能
-    bool               opt_fullscreen  = true;                     // 控制窗口是否全屏
-    bool               opt_padding     = false;                    // 控制窗口内边距是否启用(与边框保持一定空白区域)
-    ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;  // 停靠窗口接收参数标志位
-    ImGuiWindowFlags   window_flags    = ImGuiWindowFlags_None;    // 主窗口接收参数标志位
+    bool                p_open              = true;                     // *使用窗口关闭功能
+    bool                opt_fullscreen      = true;                     // 控制窗口是否全屏
+    bool                opt_padding         = false;                    // 控制窗口内边距是否启用(与边框保持一定空白区域)
+    ImGuiDockNodeFlags  dockspace_flags     = ImGuiDockNodeFlags_None;  // 停靠窗口接收参数标志位
+    ImGuiWindowFlags    window_flags        = ImGuiWindowFlags_None;    // 主窗口接收参数标志位
+    ImGuiTreeNodeFlags_ node_flags_inner    = ImGuiTreeNodeFlags_None;
+    ImGuiTreeNodeFlags_ node_flags_outer    = ImGuiTreeNodeFlags_None;
+    ImGuiTreeNodeFlags_ node_flags_selected = ImGuiTreeNodeFlags_None;
 
    private:
     // 全局初始化 ImGui
@@ -364,7 +387,7 @@ class UIRender {
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
-        ImGui::StyleColorsLight();                                           // 设置暗色主题
+        ImGui::StyleColorsClassic();                                         // 设置暗色主题
         ImGui_ImplGlfw_InitForOpenGL(this->windowRender.getWindow(), true);  // 初始化 GLFW 后端
         ImGui_ImplOpenGL3_Init("#version 330");                              // 初始化 OpenGL3 后端
     }

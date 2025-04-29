@@ -86,6 +86,7 @@ int main() {
         modelShader.setBool("isZBufferPreview", ui.isZBufferPreview);
 
         ourModel.ModelDraw(modelShader);
+
         //!--------------------------Cube--------------------------------
 
         // cubeShader->use();  // 使用着色器程序
