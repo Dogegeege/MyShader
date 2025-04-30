@@ -44,6 +44,8 @@ int main() {
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 
+    glEnable(GL_CULL_FACE);  // 启用FaceCull
+
     // timing
     float deltaTime = 0.0f;  // time between current frame and last frame
     float lastFrame = 0.0f;
@@ -85,6 +87,7 @@ int main() {
         highLightContour.setMat4("projection", projection);
 
         //!--------------------------Model--------------------------------
+        glCullFace(GL_BACK);
 
         // 内层模型
         modelShader.use();
@@ -95,6 +98,7 @@ int main() {
         ourModel.ModelDraw(modelShader);
 
         // 外层轮廓
+
         //?如果不禁用深度测试,则外层轮廓呈现透视状态
         glDisable(GL_DEPTH_TEST);
         highLightContour.use();
