@@ -19,23 +19,51 @@ glm::mat4 model      = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
 glm::mat4 view       = camera.GetViewMatrix();
 glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f);
 
-//!-----------------------------------------------------------------
-
 int main() {
+    //!--------------------------加载资源----------------------------------
+
     UIRender ui(windowRender);
 
     Shader modelShader("../../assets/shader/model.vsh", "../../assets/shader/model.fsh");
     Shader highLightContour("../../assets/shader/highlightcontour.vsh", "../../assets/shader/highlightcontour.fsh");
+    Model  ourModel = Model("../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
+    //!-------------------------------------------------------------------
 
-    Model ourModel = Model("../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
+    // 帧缓冲对象FBO
+    // FBO 是一个容器对象，本身不存储数据，而是通过附加其他缓冲区（如纹理或 RBO）实现数据存储
+    unsigned int framebuffer;
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-    //!------------------------------变换---------------------------------------
-    // const glm::vec3 cubePositions[] = {glm::vec3(0.0f, 0.0f, 0.0f),     glm::vec3(2.0f, 5.0f, -15.0f), glm::vec3(-1.5f, -2.2f, -2.5f),
-    //                                    glm::vec3(-3.8f, -2.0f, -12.3f), glm::vec3(2.4f, -0.4f, -3.5f), glm::vec3(-1.7f, 3.0f, -7.5f),
-    //                                    glm::vec3(1.3f, -2.0f, -2.5f),   glm::vec3(1.5f, 2.0f, -2.5f),  glm::vec3(1.5f, 0.2f, -1.5f),
-    //                                    glm::vec3(-1.3f, 1.0f, -1.5f)};
+    // 生成纹理
+    // RBO 是专用于存储深度、模板数据的缓冲区，通常作为 FBO 的附件，优化渲染性能
+    // 与纹理不同，RBO 不可通过着色器采样，适用于不需要后期处理的深度/模板测试场景
+    unsigned int texColorBuffer;
+    glGenTextures(1, &texColorBuffer);
+    glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
-    // glm::vec3 lightPositions(1.2f, 0.0f, 2.0f);
+    // 将它附加到当前绑定的帧缓冲对象
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
+
+    // 渲染缓冲对象
+    unsigned int RBO;
+    glGenRenderbuffers(1, &RBO);
+    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // 将渲染缓冲对象附加到帧缓冲的深度和模板附件上
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //!-------------------------------------------------------------------
 
     glEnable(GL_DEPTH_TEST);  // 启用深度测试
     glDepthFunc(GL_LESS);
