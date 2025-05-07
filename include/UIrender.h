@@ -17,7 +17,7 @@
 
 class UIRender {
    public:
-    UIRender(WindowRender& windowRender) : windowRender(windowRender) { UIInit(); }
+    UIRender(WindowRender& windowRender, FrameBuffer* pFrameBuffer) : windowRender(windowRender), pFrameBuffer(pFrameBuffer) { UIInit(); }
 
     void MainRender() {
         if (opt_fullscreen == true) {
@@ -115,6 +115,7 @@ class UIRender {
 
         /**添加自己的窗口**/
 
+        RenderWindow();
         ShowTreeView();
         ShowMainView();
         ShowModelView();
@@ -128,6 +129,22 @@ class UIRender {
         window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoWindowMenuButton;
         // window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
         ImGui::SetNextWindowClass(&window_class);
+    }
+
+    void RenderWindow() {
+        ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+
+        ImGui::Begin("ViewPort");
+        // 获取ViewPort窗口的大小
+        ImVec2 viewPortSize = ImGui::GetContentRegionAvail();
+        // ViewPort窗口大小如果有改变，那么需要重置帧缓冲区
+        if (viewPortSize.x * viewPortSize.y > 0 && (viewPortSize.x != pFrameBuffer->GetWidth() || viewPortSize.y != pFrameBuffer->GetHeight())) {
+            pFrameBuffer->Resize(viewPortSize.x, viewPortSize.y);
+        }
+        // 获取颜色纹理的ID
+        unsigned int textureID = pFrameBuffer->GetColorAttachment();
+        ImGui::Image(textureID, viewPortSize, {0, 1}, {1, 0});
+        ImGui::End();
     }
 
     int FirstIdx  = 0;  // 一级索引
@@ -387,17 +404,8 @@ class UIRender {
     }
 
     WindowRender& windowRender;
+    FrameBuffer*  pFrameBuffer;
     ImGuiIO*      io;
-
-    static inline bool GetNumeric(const std::string& str, float& num) {
-        try {
-            num = std::stof(str);
-            return true;  // 转换成功，返回true
-        } catch (const std::invalid_argument& e) {
-            // 转换失败时原参数保留
-            return false;  // 转换失败，返回false
-        }
-    }
 };
 
 #endif

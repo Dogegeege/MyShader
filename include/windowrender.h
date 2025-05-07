@@ -27,7 +27,7 @@ class WindowRender {
 
     void processInput(float deltaTime);
 
-    inline GLFWwindow* getWindow() { return window; }
+    inline GLFWwindow* getWindow() const { return window; }
     inline void        GetScreenSize(int& width, int& height);
 
     virtual ~WindowRender() {
@@ -47,6 +47,24 @@ class WindowRender {
     Camera*     camera;
 
     GLFWwindow* InitWindow();
+};
+
+class FrameBuffer {
+   public:
+    FrameBuffer(uint32_t width, uint32_t height);
+    ~FrameBuffer();
+    void            Invaidate();
+    void            Resize(uint32_t width, uint32_t height);
+    inline uint32_t GetWidth() const { return m_Width; }
+    inline uint32_t GetHeight() const { return m_Height; }
+    inline uint32_t GetColorAttachment() const { return m_ColorAttachment; }
+
+    void Bind();
+    void UBind();
+
+   private:
+    uint32_t m_FrameBufferID, m_ColorAttachment, m_DepthAttachment;
+    uint32_t m_Width, m_Height;
 };
 
 #endif

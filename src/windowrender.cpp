@@ -133,3 +133,89 @@ GLFWwindow* WindowRender::InitWindow() {
 
     return window;
 }
+
+//-----------------------------------------------------------------------------------
+
+FrameBuffer::FrameBuffer(uint32_t width, uint32_t height) : m_Width(width), m_Height(height) {
+    Invaidate();
+}
+
+FrameBuffer::~FrameBuffer() {
+    glDeleteFramebuffers(1, &m_FrameBufferID);
+}
+
+void FrameBuffer::Invaidate() {
+#if MY_GLFW_CONTEXT_VERSION_MAJOR >= 4 && MY_GLFW_CONTEXT_VERSION_MINOR >= 5
+
+    // 创建缓冲区
+    // 帧缓冲对象FBO framebuffer
+    // FBO 是一个容器对象，本身不存储数据，而是通过附加其他缓冲区（如纹理或 RBO）实现数据存储
+    glCreateFramebuffers(1, &m_FrameBufferID);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
+    // 生成三颜色通道纹理
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_ColorAttachment);
+    glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // 生成对应的颜色缓冲区
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ColorAttachment, 0);
+    // 生成深度纹理
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_DepthAttachment);
+    glBindTexture(GL_TEXTURE_2D, m_DepthAttachment);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, m_Width, m_Height);
+    // 生成深度缓冲区
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment, 0);
+
+#else
+    // 生成帧缓冲对象
+    glGenFramebuffers(1, &m_FrameBufferID);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
+
+    glGenTextures(1, &m_ColorAttachment);
+    glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ColorAttachment, 0);
+
+    glGenTextures(1, &m_DepthAttachment);
+    glBindTexture(GL_TEXTURE_2D, m_DepthAttachment);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, m_Width, m_Height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment, 0);
+
+#endif
+    // 完整性检查（带详细错误报告）
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << "[FBO Error] 0x" << std::hex << status << std::dec << " - ";
+        switch (status) {
+            case GL_FRAMEBUFFER_UNDEFINED: std::cerr << "Default framebuffer does not exist"; break;
+            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: std::cerr << "Attachment incomplete"; break;
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: std::cerr << "No valid attachments"; break;
+            case GL_FRAMEBUFFER_UNSUPPORTED: std::cerr << "Unsupported format combination"; break;
+            default: std::cerr << "Unknown error";
+        }
+        std::cerr << std::endl;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+// 窗口大小改变，重新设置缓冲区
+void FrameBuffer::Resize(uint32_t width, uint32_t height) {
+    m_Width  = width;
+    m_Height = height;
+
+    Invaidate();
+}
+
+// 绑定帧缓冲区
+void FrameBuffer::Bind() {
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferID);
+}
+
+// 解绑帧缓冲区
+void FrameBuffer::UBind() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
