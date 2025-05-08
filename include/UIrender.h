@@ -18,7 +18,7 @@
 class UIRender {
    public:
     UIRender(WindowRender& windowRender, FrameBuffer* pFrameBuffer) : windowRender(windowRender), pFrameBuffer(pFrameBuffer) { UIInit(); }
-
+    UIRender(WindowRender* windowRender, FrameBuffer* pFrameBuffer) : UIRender(*windowRender, pFrameBuffer) {}
     void MainRender() {
         if (opt_fullscreen == true) {
             const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -132,6 +132,7 @@ class UIRender {
     }
 
     void RenderWindow() {
+        HideTabBar();
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
         ImGui::Begin("ViewPort");
@@ -140,6 +141,7 @@ class UIRender {
         // ViewPort窗口大小如果有改变，那么需要重置帧缓冲区
         if (viewPortSize.x * viewPortSize.y > 0 && (viewPortSize.x != pFrameBuffer->GetWidth() || viewPortSize.y != pFrameBuffer->GetHeight())) {
             pFrameBuffer->Resize(viewPortSize.x, viewPortSize.y);
+            framebuffer_size_callback(windowRender.getWindow(), pFrameBuffer->GetWidth(), pFrameBuffer->GetHeight());
         }
         // 获取颜色纹理的ID
         unsigned int textureID = pFrameBuffer->GetColorAttachment();

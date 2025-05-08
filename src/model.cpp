@@ -127,9 +127,6 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     // 加载纹理(材质)贴图
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-    // std::cout << "mesh->mMaterialIndex  " << mesh->mMaterialIndex << " scene->mMaterials[mesh->mMaterialIndex] "
-    //           << scene->mMaterials[mesh->mMaterialIndex] << std::endl;
-
     // 漫反射材质纹理
     auto diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
@@ -161,7 +158,7 @@ std::vector<std::shared_ptr<Texture2D>> Model::loadMaterialTextures(aiMaterial* 
         //! 优化建议,开 set或者哈希
         for (unsigned int j = 0; j < textures_loaded.size(); j++) {
             // 如果在已有材质中找到存在的材质，则退出
-            if (textures_loaded[j]->path.data() == str.C_Str()) {
+            if (textures_loaded[j]->GetPath().data() == str.C_Str()) {
                 textures.push_back(textures_loaded[j]);
                 skip = true;
                 break;

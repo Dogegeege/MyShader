@@ -30,42 +30,6 @@ int main() {
     Model  ourModel = Model("../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
     //!-------------------------------------------------------------------
 
-    // // 帧缓冲对象FBO framebuffer
-    // // FBO 是一个容器对象，本身不存储数据，而是通过附加其他缓冲区（如纹理或 RBO）实现数据存储
-    // unsigned int FBO;
-    // glGenFramebuffers(1, &FBO);
-    // glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-
-    // // 生成纹理
-    // // RBO 是专用于存储深度、模板数据的缓冲区，通常作为 FBO 的附件，优化渲染性能
-    // // 与纹理不同，RBO 不可通过着色器采样，适用于不需要后期处理的深度/模板测试场景
-    // unsigned int texColorBuffer;
-    // glGenTextures(1, &texColorBuffer);
-    // glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // glBindTexture(GL_TEXTURE_2D, 0);
-
-    // // 将它附加到当前绑定的帧缓冲对象
-    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
-
-    // // 渲染缓冲对象
-    // unsigned int RBO;
-    // glGenRenderbuffers(1, &RBO);
-    // glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-    // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
-    // glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-    // // 将渲染缓冲对象附加到帧缓冲的深度和模板附件上
-    // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
-    // if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    //     std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-
-    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    //!-------------------------------------------------------------------
-
     glEnable(GL_DEPTH_TEST);  // 启用深度测试
     glDepthFunc(GL_LESS);
 

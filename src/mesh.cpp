@@ -20,7 +20,7 @@ void Mesh::Draw(Shader& shader) {
         // 获取纹理序号（diffuse_textureN 中的 N）
 
         std::string number;
-        std::string name = textures[i]->typeName;
+        std::string name = textures[i]->GetTypeName();
         if (name == "texture_diffuse")
             number = std::to_string(diffuseNr++);  // 漫反射材质纹理
         else if (name == "texture_specular")
@@ -33,7 +33,7 @@ void Mesh::Draw(Shader& shader) {
         // 需要保证着色器内部格式统一
         //* 比如 material.texure_diffuse1
         shader.setUnsignedInt((name + number), i);
-        glBindTexture(GL_TEXTURE_2D, textures[i]->textureID);
+        glBindTexture(GL_TEXTURE_2D, textures[i]->GetID());
     }
     // if (textures.empty() == true) std::cerr << "mssing textures  " << this->VAO << std::endl;
 

@@ -17,7 +17,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     float aspectRatio = camera->aspectRatio;  // 假设宽高比为 16:9
     int   viewportWidth, viewportHeight;
 
-    if (width / (float)height < aspectRatio) {
+    if (width / static_cast<float>(height) < aspectRatio) {
         viewportWidth  = static_cast<int>(height * aspectRatio);
         viewportHeight = height;
     } else {
@@ -113,10 +113,12 @@ GLFWwindow* WindowRender::InitWindow() {
     }
     //----------------------------注册回调参数---------------------------------------------
 
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);  // 调整窗口
-    glfwSetScrollCallback(window, scroll_callback);                     // 鼠标滚轮参数
-    glfwSetMouseButtonCallback(window, mouse_button_callback);          // 注册鼠标按键回调
-    glfwSetCursorPosCallback(window, mouse_callback);                   // 注册鼠标移动回调
+    //! 窗口大小改为Imgui内调整
+    // glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);  // 调整窗口
+
+    glfwSetScrollCallback(window, scroll_callback);             // 鼠标滚轮参数
+    glfwSetMouseButtonCallback(window, mouse_button_callback);  // 注册鼠标按键回调
+    glfwSetCursorPosCallback(window, mouse_callback);           // 注册鼠标移动回调
 
     // 启用鼠标监听
     // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  // 隐藏鼠标

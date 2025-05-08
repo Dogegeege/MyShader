@@ -10,77 +10,96 @@
 
 enum ETexType { RED, RGB, RGBA, SRGB, SRGBA };
 
-class Texture2D {
+class Texture {
    public:
-    Texture2D(const std::string& path, const std::string typeName, ETexType type = RGBA) : path(path), texType(type), typeName(typeName) {
-        isValid = LoadTextureFromFile(path, type);
-    }
-    Texture2D(const char* path, const std::string typeName, ETexType type = RGBA) : Texture2D(std::string(path), typeName, type) {}
-    virtual ~Texture2D() { DeleteTexture2D(); }
+    Texture(const std::string& typeName) : typeName(typeName), isValid(false), textureID(0) {}
+    virtual ~Texture() { DeleteTexture(); }
 
-    void        DeleteTexture2D() { glDeleteTextures(1, &this->textureID); }
+    inline void DeleteTexture() {
+        if (textureID != 0) {
+            glDeleteTextures(1, &textureID);
+            textureID = 0;
+        }
+    }
+
+    // 公有接口
+    GLuint      GetID() const { return textureID; }
+    std::string GetPath() const { return path; }
+    std::string GetName() const { return name; }
+    std::string GetTypeName() const { return typeName; }
+    bool        IsValid() const { return isValid; }
+
+   protected:
+    virtual bool LoadTexture() = 0;  // 纯虚函数，强制子类实现加载逻辑
+
     GLuint      textureID;
     std::string path;
     std::string name;
     std::string typeName;  // 纹理贴图的属性(法线，高光，高度...)
     bool        isValid;
+};
+
+class Texture2D : public Texture {
+   public:
+    Texture2D(const std::string& path, const std::string& typeName, ETexType type = RGBA)
+        : Texture(typeName), texType(type), nrChannels(0), width(0), height(0) {
+        std::string processedPath = path;
+        std::replace(processedPath.begin(), processedPath.end(), '\\', '/');
+        this->path    = processedPath;
+        this->isValid = LoadTexture();
+    }
+    Texture2D(const char* path, const std::string& typeName, ETexType type = RGBA) : Texture2D(std::string(path), typeName, type) {}
+
+    ETexType GetTexType() const { return texType; }
+    int      GetWidth() const { return width; }
+    int      GetHeight() const { return height; }
 
    private:
-    bool LoadTextureFromFile(const std::string& path, const ETexType type) {
-        int         width, height, nrComponents;
-        std::string path_s = path;
+    bool LoadTexture() override {
+        unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+        if (!data) {
+            std::cerr << "Texture2D failed to load: " << path << std::endl;
+            return false;
+        }
 
-        std::replace(path_s.begin(), path_s.end(), '\\', '/');
+        glGenTextures(1, &textureID);
+        glBindTexture(GL_TEXTURE_2D, textureID);
 
-        unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
-
-        glGenTextures(1, &this->textureID);
-        glBindTexture(GL_TEXTURE_2D, this->textureID);
-
+        // 设置纹理参数
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        if (data != nullptr) {
-            this->path       = path_s;
-            this->width      = width;
-            this->height     = height;
-            this->nrChannels = nrComponents;
-
-            // sRGB和RGB显示方式
-            if (nrChannels == 1) {
-                texType = ETexType::RED;
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
-            } else if (nrChannels == 3) {
-                if (type == ETexType::SRGB || type == ETexType::SRGBA) {
-                    texType = ETexType::SRGB;
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-                } else {
-                    texType = ETexType::RGB;
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-                }
-            } else if (nrChannels == 4) {
-                if (type == ETexType::SRGB || type == ETexType::SRGBA) {
-                    texType = ETexType::SRGBA;
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-                } else {
-                    texType = ETexType::RGBA;
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-                }
-            }
-            glGenerateMipmap(GL_TEXTURE_2D);
-
-            stbi_image_free(data);
-            glBindTexture(GL_TEXTURE_2D, 0);
-
-            name = path_s.substr(path_s.find_last_of('/') + 1, path_s.size());
-        } else {
-            std::cerr << "Texture failed to load at path: " << path << std::endl;
-            stbi_image_free(data);
-            glBindTexture(GL_TEXTURE_2D, 0);
-            return false;
+        // 根据通道数和类型决定格式
+        GLenum format         = GL_RGB;
+        GLenum internalFormat = GL_RGB;
+        switch (nrChannels) {
+            case 1:
+                internalFormat = GL_RED;
+                format         = GL_RED;
+                texType        = RED;
+                break;
+            case 3:
+                internalFormat = (texType == SRGB) ? GL_SRGB : GL_RGB;
+                format         = GL_RGB;
+                break;
+            case 4:
+                internalFormat = (texType == SRGBA) ? GL_SRGB_ALPHA : GL_RGBA;
+                format         = GL_RGBA;
+                break;
         }
+
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        stbi_image_free(data);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        // 提取文件名
+        size_t lastSlash = path.find_last_of('/');
+        name             = (lastSlash != std::string::npos) ? path.substr(lastSlash + 1) : path;
+
         return true;
     }
 
@@ -88,6 +107,61 @@ class Texture2D {
     int      height;
     int      nrChannels;
     ETexType texType;
+};
+
+class TextureCubeMap : public Texture {
+   public:
+    TextureCubeMap(const std::vector<std::string>& faces, const std::string& typeName) : Texture(typeName) {
+        this->faces   = faces;
+        this->isValid = LoadTexture();
+    }
+
+   private:
+    bool LoadTexture() override {
+        glGenTextures(1, &textureID);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+        int width, height, nrChannels;
+        for (unsigned int i = 0; i < faces.size(); i++) {
+            unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+            if (!data) {
+                std::cerr << "Cubemap texture failed to load: " << faces[i] << std::endl;
+                return false;
+            }
+
+            GLenum format = GL_RGB;
+            switch (nrChannels) {
+                case 1: format = GL_RED; break;
+                case 3: format = GL_RGB; break;
+                case 4: format = GL_RGBA; break;
+            }
+
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+
+            // 加载完立即释放
+            stbi_image_free(data);
+        }
+
+        // 设置立方体贴图参数
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+        // 记录第一个面的路径作为主路径
+        if (!faces.empty()) {
+            path             = faces[0];
+            size_t lastSlash = path.find_last_of('/');
+            name             = (lastSlash != std::string::npos) ? path.substr(lastSlash + 1) : path;
+        }
+
+        return true;
+    }
+
+    std::vector<std::string> faces;
 };
 
 #endif
