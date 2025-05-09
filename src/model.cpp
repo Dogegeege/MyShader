@@ -143,6 +143,11 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     auto heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
+    //! 请处理纹理贴图加载失败的情况
+    //! 使用默认纹理
+    //!----------------------------------------------------
+    //!
+
     return std::make_shared<Mesh>(vertices, indices, textures);
 }
 

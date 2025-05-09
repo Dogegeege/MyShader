@@ -27,7 +27,47 @@ int main() {
 
     Shader modelShader("../../assets/shader/model.vsh", "../../assets/shader/model.fsh");
     Shader highLightContour("../../assets/shader/highlightcontour.vsh", "../../assets/shader/highlightcontour.fsh");
-    Model  ourModel = Model("../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
+    Shader skyboxShader("../../assets/shader/skybox.vsh", "../../assets/shader/skybox.fsh");
+
+    Model ourModel = Model("../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
+
+    // 创建立方体贴图
+    std::vector<std::string> skyboxFaces = {"../../assets/img/skybox/right.jpg", "../../assets/img/skybox/left.jpg",
+                                            "../../assets/img/skybox/top.jpg",   "../../assets/img/skybox/bottom.jpg",
+                                            "../../assets/img/skybox/front.jpg", "../../assets/img/skybox/back.jpg"};
+    TextureCubeMap           skybox(skyboxFaces, "skybox");
+
+    float skyboxVertices[] = {
+        // positions
+        -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f,
+
+        -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
+
+        1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f,
+
+        -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
+
+        -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
+
+        -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
+
+    // skybox VAO
+    unsigned int skyboxVAO, skyboxVBO;
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glBindVertexArray(skyboxVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    glBindVertexArray(0);
+
+    skyboxShader.use();
+    skyboxShader.setUnsignedInt("skybox", 0);
+
     //!-------------------------------------------------------------------
 
     glEnable(GL_DEPTH_TEST);  // 启用深度测试
@@ -94,7 +134,7 @@ int main() {
 
         // 外层轮廓
 
-        //?如果不禁用深度测试,则外层轮廓呈现透视状态
+        //?如果禁用深度测试,则外层轮廓呈现透视状态
         glDisable(GL_DEPTH_TEST);
         highLightContour.use();
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -108,7 +148,30 @@ int main() {
 
         glEnable(GL_DEPTH_TEST);
 
-        pFrameBuffer->UBind();
+        //!-------------------------------SkyBox-----------------------------------------
+        if (skybox.IsValid() == true) {
+            glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetID());
+            // 使用立方体贴图...
+
+            // draw skybox as last
+            glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+            skyboxShader.use();
+
+            glm::mat4 unTransView = glm::mat4(glm::mat3(camera.GetViewMatrix()));  // remove translation from the view matrix
+
+            skyboxShader.setMat4("view", unTransView);
+            skyboxShader.setMat4("projection", projection);
+
+            // skybox cube
+            glBindVertexArray(skyboxVAO);
+            glActiveTexture(GL_TEXTURE0);
+
+            glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetID());
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+
+            glBindVertexArray(0);
+            glDepthFunc(GL_LESS);  // set depth function back to default
+        }
 #ifdef CUBESHADE
 
         //!--------------------------Cube--------------------------------
@@ -177,6 +240,8 @@ int main() {
         // ligtingVertex.bindAndDrawElements();
 #endif
 
+        pFrameBuffer->UBind();
+
         //!-------------------------------imgui-----------------------------------------
 
         ui.RenderUI();
@@ -193,8 +258,8 @@ int main() {
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
-    // glDeleteRenderbuffers(1, &RBO);
-    // glDeleteFramebuffers(1, &FBO);
+    glDeleteVertexArrays(1, &skyboxVAO);
+    glDeleteBuffers(1, &skyboxVBO);
 
     windowRender.~WindowRender();  // 显式写出
     return 0;
