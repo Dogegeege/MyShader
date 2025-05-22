@@ -8,9 +8,15 @@ layout(location = 4)in vec3 bitangent;
 
 out vec2 TexCoords;
 
+layout(std140)uniform Matrices
+{
+    mat4 projection;
+    mat4 view;
+};
+
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+//uniform mat4 view;
+//uniform mat4 projection;
 
 void main()
 {

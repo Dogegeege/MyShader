@@ -25,9 +25,31 @@ int main() {
 
     UIRender ui(windowRender, pFrameBuffer);
 
+    //!--------------------------着色器----------------------------------
+
     Shader modelShader("../../assets/shader/model.vsh", "../../assets/shader/model.fsh");
     Shader highLightContour("../../assets/shader/highlightcontour.vsh", "../../assets/shader/highlightcontour.fsh");
     Shader skyboxShader("../../assets/shader/skybox.vsh", "../../assets/shader/skybox.fsh");
+
+    // 全局Uniform块
+    //! 需要封装进Shader.h
+    unsigned int uniformBlockIndexModel            = glGetUniformBlockIndex(modelShader.ID, "Matrices");
+    unsigned int uniformBlockIndexHighLightContour = glGetUniformBlockIndex(highLightContour.ID, "Matrices");
+
+    glUniformBlockBinding(modelShader.ID, uniformBlockIndexModel, 0);
+    glUniformBlockBinding(highLightContour.ID, uniformBlockIndexHighLightContour, 0);
+
+    unsigned int uboMatrices;
+
+    glGenBuffers(1, &uboMatrices);
+
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
+
+    //!--------------------------------------------------------------------
 
     Model ourModel = Model("../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
 
@@ -111,16 +133,23 @@ int main() {
 
         modelShader.use();
         modelShader.setMat4("model", model);
-        modelShader.setMat4("view", view);
-        modelShader.setMat4("projection", projection);
+        // modelShader.setMat4("view", view);
+        // modelShader.setMat4("projection", projection);
 
         modelShader.setBool("isZBufferPreview", ui.isZBufferPreview);
 
         highLightContour.use();
         highLightContour.setMat4("model", model);
-        highLightContour.setMat4("view", view);
-        highLightContour.setMat4("projection", projection);
+        // highLightContour.setMat4("view", view);
+        // highLightContour.setMat4("projection", projection);
 
+        glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+        glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
         //!--------------------------Model--------------------------------
         glCullFace(GL_BACK);
 
