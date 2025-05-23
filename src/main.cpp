@@ -133,23 +133,22 @@ int main() {
         ourModel.ModelDraw(modelShader);
 
         // 外层轮廓
-
-        //?如果禁用深度测试,则外层轮廓呈现透视状态
-        glDisable(GL_DEPTH_TEST);
-        highLightContour.use();
+        //?如果禁用深度测试,则外层轮廓呈现透视状态,增加天空盒后不要禁用深度测试
+        // glDisable(GL_DEPTH_TEST);
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);  // 禁止修改
 
+        highLightContour.use();
         ourModel.ModelDraw(highLightContour);
 
         // *写回保证下一轮glClear可以清除模板缓存
         glStencilMask(0xFF);
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
 
-        glEnable(GL_DEPTH_TEST);
+        // glEnable(GL_DEPTH_TEST);
 
         //!-------------------------------SkyBox-----------------------------------------
-        if (skybox.IsValid() == true) {
+        if (skybox.IsValid() == true && ui.isSkyboxPreview == true) {
             glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetID());
             // 使用立方体贴图...
 
@@ -172,6 +171,7 @@ int main() {
             glBindVertexArray(0);
             glDepthFunc(GL_LESS);  // set depth function back to default
         }
+
 #ifdef CUBESHADE
 
         //!--------------------------Cube--------------------------------
