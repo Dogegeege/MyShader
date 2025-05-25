@@ -55,7 +55,7 @@ class Mesh {
     std::vector<std::shared_ptr<Texture2D>> textures;
 
    private:
-    void setupMesh();
+    void SetupMesh();
 
     GLuint VAO, VBO, EBO;
 };

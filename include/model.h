@@ -8,20 +8,20 @@
 class Model {
    public:
     Model(const std::string& path);
-    virtual ~Model() { LoadedModel.erase(name); }
+    virtual ~Model() { loadedModel.erase(name); }
 
     void ModelDraw(Shader& shader);
 
     std::string directory;
     std::string name;
 
-    static std::map<std::string, std::shared_ptr<Model>> LoadedModel;
+    static std::map<std::string, std::shared_ptr<Model>> loadedModel;
 
    private:
-    void                                    loadModel(const std::string& path);
-    void                                    processNode(aiNode* node, const aiScene* scene);
-    std::shared_ptr<Mesh>                   processMesh(aiMesh* mesh, const aiScene* scene);
-    std::vector<std::shared_ptr<Texture2D>> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
+    void                                    LoadModel(const std::string& path);
+    void                                    ProcessNode(aiNode* node, const aiScene* scene);
+    std::shared_ptr<Mesh>                   ProcessMesh(aiMesh* mesh, const aiScene* scene);
+    std::vector<std::shared_ptr<Texture2D>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
 
     /*  模型数据  */
     std::vector<std::shared_ptr<Mesh>>      meshes;

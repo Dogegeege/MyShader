@@ -1,12 +1,12 @@
 #include "model.h"
 
-std::map<std::string, std::shared_ptr<Model>> Model::LoadedModel;
+std::map<std::string, std::shared_ptr<Model>> Model::loadedModel;
 //------------------------------------------------------------------------
 
 Model::Model(const std::string& path) {
     name = path.substr(path.find_last_of('/') + 1, path.size());
-    loadModel(path);
-    LoadedModel.insert({name, std::make_shared<Model>(*this)});
+    LoadModel(path);
+    loadedModel.insert({name, std::make_shared<Model>(*this)});
 }
 
 /**
@@ -18,7 +18,7 @@ void Model::ModelDraw(Shader& shader) {
     for (unsigned int i = 0; i < meshes.size(); i++) meshes[i]->Draw(shader);
 }
 
-void Model::loadModel(const std::string& path) {
+void Model::LoadModel(const std::string& path) {
     Assimp::Importer import;
 
     /**
@@ -45,7 +45,7 @@ void Model::loadModel(const std::string& path) {
     }
     directory = path.substr(0, path.find_last_of('/'));
 
-    processNode(scene->mRootNode, scene);
+    ProcessNode(scene->mRootNode, scene);
 }
 
 /**
@@ -53,18 +53,18 @@ void Model::loadModel(const std::string& path) {
  * ?此处忽略了父子网格，直接搜索遍历出所有的网格，该方法并不保证可以对子网格操作，比如想位移一个汽车的网格时，
  * ?不能保证它的所有子网格（比如引擎网格、方向盘网格、轮胎网格）都会随着一起位移。这样的系统能够用父子关系就很容易地创建出来。
  */
-void Model::processNode(aiNode* node, const aiScene* scene) {
+void Model::ProcessNode(aiNode* node, const aiScene* scene) {
     // 处理节点所有的网格（如果有的话）
     for (unsigned int i = 0; i < node->mNumMeshes; i++) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        meshes.push_back(processMesh(mesh, scene));
+        meshes.push_back(ProcessMesh(mesh, scene));
     }
 
     // 接下来对它的子节点重复这一过程
-    for (unsigned int i = 0; i < node->mNumChildren; i++) { processNode(node->mChildren[i], scene); }
+    for (unsigned int i = 0; i < node->mNumChildren; i++) { ProcessNode(node->mChildren[i], scene); }
 }
 
-std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene) {
+std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene) {
     std::vector<Vertex>                     vertices;
     std::vector<GLuint>                     indices;
     std::vector<std::shared_ptr<Texture2D>> textures;
@@ -128,19 +128,19 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
     // 漫反射材质纹理
-    auto diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+    auto diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
     // 镜面反射材质纹理
-    auto specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+    auto specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
     // 法线纹理
-    auto normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+    auto normalMaps = LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
     textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
     // 高度纹理
-    auto heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+    auto heightMaps = LoadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
     //! 请处理纹理贴图加载失败的情况
@@ -151,7 +151,7 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     return std::make_shared<Mesh>(vertices, indices, textures);
 }
 
-std::vector<std::shared_ptr<Texture2D>> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
+std::vector<std::shared_ptr<Texture2D>> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
     std::vector<std::shared_ptr<Texture2D>> textures;
 
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {

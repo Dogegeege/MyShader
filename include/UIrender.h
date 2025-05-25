@@ -272,7 +272,7 @@ class UIRender {
         if (ImGui::TreeNodeEx("模型", node_flags_outer)) {
             //! 此处技术未学到 关键词 FBO 存储多个模型实例，每个模型分配唯一整数 ID，每个模型存储独立变换矩阵...
             //! 以及点击选中的效果
-            for (auto [i, j] : Model::LoadedModel) {
+            for (auto [i, j] : Model::loadedModel) {
                 if (ImGui::TreeNodeEx(i.c_str(), node_flags_selected)) {
                     if (ImGui::IsItemClicked()) {
                         // if (isSelected == false) {

@@ -2,7 +2,7 @@
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<std::shared_ptr<Texture2D>> textures)
     : vertices(vertices), indices(indices), textures(textures) {
-    setupMesh();
+    SetupMesh();
 }
 
 void Mesh::Draw(Shader& shader) {
@@ -46,7 +46,7 @@ void Mesh::Draw(Shader& shader) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Mesh::setupMesh() {
+void Mesh::SetupMesh() {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
