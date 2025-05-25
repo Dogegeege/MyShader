@@ -265,7 +265,7 @@ class UIRender {
     }
 
     bool isZBufferPreview = false;
-
+    bool isSkyboxPreview  = true;
     void ShowModelView() {
         // HideTabBar();
         ImGui::Begin("场景集合");
@@ -293,6 +293,8 @@ class UIRender {
         }
 
         ImGui::Checkbox("Z-buffer预览", &isZBufferPreview);
+        ImGui::Checkbox("天空盒预览", &isSkyboxPreview);
+
         ImGui::End();
     }
 
