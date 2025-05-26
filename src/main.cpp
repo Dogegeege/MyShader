@@ -7,6 +7,7 @@
 #include "UIrender.h"
 
 #include "camera.h"
+#include "grid.h"
 #include "model.h"
 #include "shader.h"
 #include "texture.h"
@@ -25,11 +26,14 @@ int main() {
 
     UIRender ui(windowRender, pFrameBuffer);
 
+    Grid grid;
+
     //!--------------------------着色器----------------------------------
 
     Shader modelShader("../../assets/shader/model.vsh", "../../assets/shader/model.fsh");
     Shader highLightContour("../../assets/shader/highlightcontour.vsh", "../../assets/shader/highlightcontour.fsh");
     Shader skyboxShader("../../assets/shader/skybox.vsh", "../../assets/shader/skybox.fsh");
+    Shader gridShader("../../assets/shader/grid.vsh", "../../assets/shader/grid.fsh");
 
     // 全局Uniform块
     //! 需要封装进Shader.h
@@ -38,6 +42,7 @@ int main() {
 
     glUniformBlockBinding(modelShader.ID, uniformBlockIndexModel, 0);
     glUniformBlockBinding(highLightContour.ID, uniformBlockIndexHighLightContour, 0);
+    glUniformBlockBinding(gridShader.ID, uniformBlockIndexHighLightContour, 0);
 
     unsigned int uboMatrices;
 
@@ -204,6 +209,12 @@ int main() {
 
             glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         }
+
+        //!-----------------------------------axis---------------------------------
+        gridShader.use();
+
+        grid.Draw(gridShader);
+
 #ifdef CUBESHADE
 
         //!--------------------------Cube--------------------------------

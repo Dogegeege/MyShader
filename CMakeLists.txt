@@ -47,7 +47,7 @@ add_subdirectory(3rdParty)
 
 #头文件
 file(GLOB PROJECT_HEADERS
-    include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
     #include/Application
 )
 
