@@ -19,6 +19,7 @@ class Grid {
     Grid() { SetupGrid(); }
     void Draw(Shader& shader) {
         glBindVertexArray(VAO);
+        glLineWidth(2.0f);             // 设置线宽
         glDrawArrays(GL_LINES, 0, 6);  // 绘制三条轴线
         glBindVertexArray(0);
     }
