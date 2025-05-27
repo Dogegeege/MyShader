@@ -1,12 +1,12 @@
 #include "model.h"
 
-std::map<std::string, std::shared_ptr<Model>> Model::loadedModel;
+std::map<std::string, std::shared_ptr<Object3D>> Object3D::loadedObject3D;
 //------------------------------------------------------------------------
 
 Model::Model(const std::string& path) {
     name = path.substr(path.find_last_of('/') + 1, path.size());
     LoadModel(path);
-    loadedModel.insert({name, std::make_shared<Model>(*this)});
+    loadedObject3D.insert({name, std::make_shared<Model>(*this)});
 }
 
 /**
@@ -14,7 +14,7 @@ Model::Model(const std::string& path) {
  * @param shader 选择对模型渲染的着色器
  *
  */
-void Model::ModelDraw(Shader& shader) {
+void Model::Draw(Shader& shader) {
     for (unsigned int i = 0; i < meshes.size(); i++) meshes[i]->Draw(shader);
 }
 

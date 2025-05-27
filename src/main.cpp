@@ -56,7 +56,7 @@ int main() {
 
     //!--------------------------------------------------------------------
 
-    Model ourModel = Model("../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
+    Object3D* ourModel = new Model("../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
 
     // 创建立方体贴图
     std::vector<std::string> skyboxFaces = {"../../assets/img/skybox/right.jpg", "../../assets/img/skybox/left.jpg",
@@ -164,7 +164,7 @@ int main() {
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);  // 每一位都可以被修改，即启用模板缓冲写入
 
-        ourModel.ModelDraw(modelShader);
+        ourModel->Draw(modelShader);
 
         // 外层轮廓
 
@@ -174,7 +174,7 @@ int main() {
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);  // 禁止修改
 
-        ourModel.ModelDraw(highLightContour);
+        ourModel->Draw(highLightContour);
 
         // *写回保证下一轮glClear可以清除模板缓存
         glStencilMask(0xFF);

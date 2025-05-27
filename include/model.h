@@ -4,18 +4,17 @@
 #include <map>
 
 #include "mesh.h"
+#include "object.h"
 
-class Model {
+std::map<std::string, std::shared_ptr<Object3D>> Object3D::loadedObject3D;
+
+class Model : public Object3D {
    public:
     Model(const std::string& path);
-    virtual ~Model() { loadedModel.erase(name); }
 
-    void ModelDraw(Shader& shader);
+    void Draw(Shader& shader) override;
 
     std::string directory;
-    std::string name;
-
-    static std::map<std::string, std::shared_ptr<Model>> loadedModel;
 
    private:
     void                                    LoadModel(const std::string& path);
