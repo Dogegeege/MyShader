@@ -15,6 +15,7 @@ Model::Model(const std::string& path) {
  *
  */
 void Model::Draw(Shader& shader) {
+    shader.use();
     for (unsigned int i = 0; i < meshes.size(); i++) meshes[i]->Draw(shader);
 }
 

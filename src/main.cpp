@@ -9,7 +9,8 @@
 #include "camera.h"
 #include "grid.h"
 #include "model.h"
-#include "shader.h"
+#include "object.h"
+#include "skybox.h"
 #include "texture.h"
 #include "windowrender.h"
 
@@ -62,40 +63,10 @@ int main() {
     std::vector<std::string> skyboxFaces = {"../../assets/img/skybox/right.jpg", "../../assets/img/skybox/left.jpg",
                                             "../../assets/img/skybox/top.jpg",   "../../assets/img/skybox/bottom.jpg",
                                             "../../assets/img/skybox/front.jpg", "../../assets/img/skybox/back.jpg"};
-    TextureCubeMap           skybox(skyboxFaces, "skybox");
 
-    float skyboxVertices[] = {
-        // positions
-        -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f,
+    Skybox* skybox = new Skybox(skyboxFaces, "Skybox");
 
-        -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
-
-        1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f,
-
-        -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
-
-        -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
-
-        -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
-
-    // skybox VAO
-    unsigned int skyboxVAO, skyboxVBO;
-    glGenVertexArrays(1, &skyboxVAO);
-    glGenBuffers(1, &skyboxVBO);
-    glBindVertexArray(skyboxVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-    glBindVertexArray(0);
-
-    skyboxShader.use();
-    skyboxShader.setUnsignedInt("skybox", 0);
-
-    //!-------------------------------------------------------------------
+     //!-------------------------------------------------------------------
 
     glEnable(GL_DEPTH_TEST);  // 启用深度测试
     glDepthFunc(GL_LESS);
@@ -123,8 +94,7 @@ int main() {
         pFrameBuffer->Bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        //!--------------------------Shader--------------------------------
-
+        //!--------------------------Transform--------------------------------
         model = glm::translate(glm::mat4(1.0f), ui.translate);
         model = glm::scale(model, glm::vec3(ui.scale, ui.scale, ui.scale));
 
@@ -135,6 +105,10 @@ int main() {
         model *= glm::mat4_cast(quatZ * quatY * quatX);
         view       = camera.GetViewMatrix();
         projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f);
+
+        ourModel->SetModelMatrix(model);
+
+        //!--------------------------Shader--------------------------------
 
         modelShader.use();
         modelShader.setMat4("model", model);
@@ -155,59 +129,25 @@ int main() {
         glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
         glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
-        //!--------------------------Model--------------------------------
+        //!--------------------------ObjectShade--------------------------------
         glCullFace(GL_BACK);
 
-        // 内层模型
-        modelShader.use();
-
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);  // 每一位都可以被修改，即启用模板缓冲写入
-
-        ourModel->Draw(modelShader);
-
-        // 外层轮廓
-
-        //?如果禁用深度测试,则外层轮廓呈现透视状态
-        // glDisable(GL_DEPTH_TEST);
-        highLightContour.use();
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00);  // 禁止修改
-
-        ourModel->Draw(highLightContour);
-
-        // *写回保证下一轮glClear可以清除模板缓存
-        glStencilMask(0xFF);
-        glStencilFunc(GL_ALWAYS, 0, 0xFF);
-
-        // glEnable(GL_DEPTH_TEST);
+        ourModel->SetHighLight(ui.showHightLight);
+        ourModel->Draw(modelShader, highLightContour);
 
         //!-------------------------------SkyBox-----------------------------------------
-        if (skybox.IsValid() == true && ui.isSkyboxPreview == true) {
-            glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetID());
-            // 使用立方体贴图...
-
+        if (ui.isSkyboxPreview == true) {
             // draw skybox as last
             glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+
             skyboxShader.use();
-
             glm::mat4 unTransView = glm::mat4(glm::mat3(camera.GetViewMatrix()));  // remove translation from the view matrix
-
             skyboxShader.setMat4("view", unTransView);
             skyboxShader.setMat4("projection", projection);
 
-            // skybox cube
-            glBindVertexArray(skyboxVAO);
+            skybox->Draw(skyboxShader);
 
-            glActiveTexture(GL_TEXTURE0);
-
-            glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetID());
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-
-            glBindVertexArray(0);
             glDepthFunc(GL_LESS);  // set depth function back to default
-
-            glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         }
 
         //!-----------------------------------axis---------------------------------
@@ -300,9 +240,6 @@ int main() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-
-    glDeleteVertexArrays(1, &skyboxVAO);
-    glDeleteBuffers(1, &skyboxVBO);
 
     windowRender.~WindowRender();  // 显式写出
     return 0;

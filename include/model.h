@@ -6,8 +6,6 @@
 #include "mesh.h"
 #include "object.h"
 
-std::map<std::string, std::shared_ptr<Object3D>> Object3D::loadedObject3D;
-
 class Model : public Object3D {
    public:
     Model(const std::string& path);

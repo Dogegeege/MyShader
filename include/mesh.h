@@ -57,7 +57,7 @@ class Mesh {
    private:
     void SetupMesh();
 
-    GLuint VAO, VBO, EBO;
+    unsigned int VAO, VBO, EBO;
 };
 
 #endif
