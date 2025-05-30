@@ -8,13 +8,13 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vecto
 void Mesh::Draw(Shader& shader) {
     //! 注意，从1开始计数
 
-    GLuint diffuseNr  = 1;
-    GLuint specularNr = 1;
-    GLuint normalNr   = 1;
-    GLuint heightNr   = 1;
+    unsigned int diffuseNr  = 1;
+    unsigned int specularNr = 1;
+    unsigned int normalNr   = 1;
+    unsigned int heightNr   = 1;
 
     //*一般不用管循环，因为一个网格对应一个纹理
-    for (GLuint i = 0; i < textures.size(); i++) {
+    for (unsigned int i = 0; i < textures.size(); i++) {
         glActiveTexture(GL_TEXTURE0 + i);  // 在绑定之前激活相应的纹理单元
 
         // 获取纹理序号（diffuse_textureN 中的 N）

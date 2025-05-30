@@ -12,12 +12,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "shader.h"
+#include "object.h"
 
-class Grid {
+class Grid : public Object3D {
    public:
     Grid() { SetupGrid(); }
-    void Draw(Shader& shader) {
+    void Draw(Shader& shader) override {
         glBindVertexArray(VAO);
         glLineWidth(2.0f);             // 设置线宽
         glDrawArrays(GL_LINES, 0, 6);  // 绘制三条轴线

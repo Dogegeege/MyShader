@@ -23,20 +23,20 @@ class Texture {
     }
 
     // 公有接口
-    GLuint      GetID() const { return textureID; }
-    std::string GetPath() const { return path; }
-    std::string GetName() const { return name; }
-    std::string GetTypeName() const { return typeName; }
-    bool        IsValid() const { return isValid; }
+    unsigned int GetID() const { return textureID; }
+    std::string  GetPath() const { return path; }
+    std::string  GetName() const { return name; }
+    std::string  GetTypeName() const { return typeName; }
+    bool         IsValid() const { return isValid; }
 
    protected:
     virtual bool LoadTexture() = 0;  // 纯虚函数，强制子类实现加载逻辑
 
-    GLuint      textureID;
-    std::string path;
-    std::string name;
-    std::string typeName;  // 纹理贴图的属性(法线，高光，高度...)
-    bool        isValid;
+    unsigned int textureID;
+    std::string  path;
+    std::string  name;
+    std::string  typeName;  // 纹理贴图的属性(法线，高光，高度...)
+    bool         isValid;
 };
 
 class Texture2D : public Texture {
@@ -112,7 +112,11 @@ class Texture2D : public Texture {
 class TextureCubeMap : public Texture {
    public:
     TextureCubeMap(const std::vector<std::string>& faces, const std::string& typeName) : Texture(typeName) {
-        this->faces   = faces;
+        for (const auto& face : faces) {
+            std::string processedFace = face;
+            std::replace(processedFace.begin(), processedFace.end(), '\\', '/');
+            this->faces.push_back(processedFace);
+        }
         this->isValid = LoadTexture();
     }
 
@@ -122,10 +126,10 @@ class TextureCubeMap : public Texture {
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
         int width, height, nrChannels;
-        for (unsigned int i = 0; i < faces.size(); i++) {
-            unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+        for (unsigned int i = 0; i < this->faces.size(); i++) {
+            unsigned char* data = stbi_load(this->faces[i].c_str(), &width, &height, &nrChannels, 0);
             if (!data) {
-                std::cerr << "Cubemap texture failed to load: " << faces[i] << std::endl;
+                std::cerr << "Cubemap texture failed to load: " << this->faces[i] << std::endl;
                 return false;
             }
 
@@ -152,8 +156,8 @@ class TextureCubeMap : public Texture {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
         // 记录第一个面的路径作为主路径
-        if (!faces.empty()) {
-            path             = faces[0];
+        if (!this->faces.empty()) {
+            path             = this->faces[0];
             size_t lastSlash = path.find_last_of('/');
             name             = (lastSlash != std::string::npos) ? path.substr(lastSlash + 1) : path;
         }
@@ -162,6 +166,7 @@ class TextureCubeMap : public Texture {
     }
 
     std::vector<std::string> faces;
+    std::vector<std::string> paths;
 };
 
 #endif
