@@ -93,8 +93,19 @@ add_executable(${TARGET_NAME} ${PROJECT_SOURCES})
 # 添加头文件搜索路径
 # 设置为 PUBLIC 是为了浏览子模块时候头文件不报错
 target_include_directories(${TARGET_NAME} PUBLIC
-    ${THIRD_PARTY_HEADERS}
-    ${PROJECT_HEADERS}
+    #${THIRD_PARTY_HEADERS}
+    3rdParty/glad/include
+    3rdParty/glfw/include
+    3rdParty/glm-1.0.1
+    3rdParty/imgui-docking
+    3rdParty/stb_image
+    3rdParty/assimp/include
+    ${CMAKE_BINARY_DIR}/3rdParty/assimp/include/assimp
+    
+
+    #${PROJECT_HEADERS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+
 )
 
 # 添加文件分组

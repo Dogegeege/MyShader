@@ -14,7 +14,7 @@
 
 #include "object.h"
 
-class Grid : public Object3D {
+class Grid : public Object {
    public:
     Grid() { SetupGrid(); }
     void Draw(Shader& shader) override {

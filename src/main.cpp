@@ -4,12 +4,14 @@
 #include <memory>
 #include <vector>
 
-#include "UIrender.h"
+#include <imgui.h>
 
+#include "UIrender.h"
 #include "camera.h"
 #include "grid.h"
 #include "model.h"
 #include "object.h"
+#include "shader.h"
 #include "skybox.h"
 #include "texture.h"
 #include "windowrender.h"
@@ -66,7 +68,7 @@ int main() {
 
     Skybox* skybox = new Skybox(skyboxFaces, "Skybox");
 
-     //!-------------------------------------------------------------------
+    //!-------------------------------------------------------------------
 
     glEnable(GL_DEPTH_TEST);  // 启用深度测试
     glDepthFunc(GL_LESS);

@@ -5,11 +5,19 @@
 #include <memory>
 #include <string>
 
-#include <glm/glm.hpp>
-
 #include "shader.h"
 
-class Object3D {
+class Object {
+   public:
+    Object() = default;
+    virtual ~Object() {};
+
+    virtual void Draw(Shader& shader) = 0;
+
+    std::string name;
+};
+
+class Object3D : public Object {
    public:
     Object3D() = default;
     virtual ~Object3D() { loadedObject3D.erase(name); };
@@ -47,8 +55,6 @@ class Object3D {
         if (it != loadedObject3D.end()) { return it->second; }
         return nullptr;
     }
-
-    std::string name;
 
    private:
     bool      isHighLight = false;  // 是否启用背景轮廓
