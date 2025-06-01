@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<std::shared_ptr<Texture2D>> textures)
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<std::shared_ptr<Texture2D>> textures)
     : vertices(vertices), indices(indices), textures(textures) {
     SetupMesh();
 }

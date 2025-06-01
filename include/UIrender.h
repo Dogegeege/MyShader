@@ -98,7 +98,8 @@ class UIRender {
                 // 不关闭菜单
 
                 /* if (ImGui::MenuItem("Close", NULL, false, p_open != NULL))
-                 *p_open = false;*/
+                 *p_open = false;
+                 */
 
                 ImGui::EndMenu();
             }
@@ -124,20 +125,30 @@ class UIRender {
     }
 
     // 隐藏窗口的TabBar
-    void HideTabBar() {
+    void HideTabBar(bool isHideTarbar = false) {
         ImGuiWindowClass window_class;
         window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoWindowMenuButton;
-        // window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
+        if (isHideTarbar == true) window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
         ImGui::SetNextWindowClass(&window_class);
     }
+
+    ImVec2       mousePos;
+    ImVec2       viewPortSize;
+    ImVec2       imageScreenPos;
+    ImVec2       relativePos;
+    unsigned int nowID = 0;
 
     void RenderWindow() {
         HideTabBar();
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
         ImGui::Begin("ViewPort");
-        // 获取ViewPort窗口的大小
-        ImVec2 viewPortSize = ImGui::GetContentRegionAvail();
+        //! 注意 获取位置 ImGui::Begin("ViewPort") 之后，ImGui::Image 之前
+        viewPortSize   = ImGui::GetContentRegionAvail();  // 获取ViewPort窗口的大小
+        imageScreenPos = ImGui::GetCursorScreenPos();     // Image区域左上角屏幕坐标
+        mousePos       = ImGui::GetMousePos();
+        relativePos    = ImVec2(mousePos.x - imageScreenPos.x, mousePos.y - imageScreenPos.y);
+
         // ViewPort窗口大小如果有改变，那么需要重置帧缓冲区
         if (viewPortSize.x * viewPortSize.y > 0 && (viewPortSize.x != pFrameBuffer->GetWidth() || viewPortSize.y != pFrameBuffer->GetHeight())) {
             pFrameBuffer->Resize(viewPortSize.x, viewPortSize.y);
@@ -146,6 +157,13 @@ class UIRender {
         // 获取颜色纹理的ID
         unsigned int textureID = pFrameBuffer->GetColorAttachment();
         ImGui::Image(textureID, viewPortSize, {0, 1}, {1, 0});
+
+        // OpenGL坐标Y轴翻转
+        unsigned int px = static_cast<unsigned int>(relativePos.x);
+        unsigned int py = pFrameBuffer->GetHeight() - static_cast<unsigned int>(relativePos.y) - 1;
+
+        glm::uvec3 id = pFrameBuffer->ReadPixel(px, py);
+        nowID         = id.x;
         ImGui::End();
     }
 
@@ -221,7 +239,7 @@ class UIRender {
 
     // 内容页面
     void ShowMainView() {
-        HideTabBar();
+        HideTabBar(true);
 
         // 清除之前的内容
         ImGui::Begin("页面窗口");
@@ -239,29 +257,37 @@ class UIRender {
     }
 
     void ShowPageView0() {
-        ImGui::Text("功能%d -> 按钮%d -> 页面0", FirstIdx, SecondIdx);
+        ImGui::Text("调试参数:%d , %d", FirstIdx, SecondIdx);
 
-        // 一个表格示例
+        ImGui::Text("渲染窗口大小 %f %f ", viewPortSize.x, viewPortSize.y);
+        ImGui::Text("渲染窗口左上角坐标 %f %f ", imageScreenPos.x, imageScreenPos.y);
 
-        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable |
-                                       ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+        ImGui::Text("鼠标坐标 %f %f ", mousePos.x, mousePos.y);
+        ImGui::Text("相对坐标 %f %f ", relativePos.x, relativePos.y);
+        ImGui::Text("鼠标当前ID %d ", nowID);
 
-        if (ImGui::BeginTable("table0", 3, flags)) {
-            ImGui::TableSetupColumn("AAA", ImGuiTableColumnFlags_WidthFixed);
-            ImGui::TableSetupColumn("BBB", ImGuiTableColumnFlags_WidthFixed);
-            ImGui::TableSetupColumn("CCC", ImGuiTableColumnFlags_WidthStretch);
-            ImGui::TableHeadersRow();
+        // // 一个表格示例
 
-            for (int row = 0; row < 5; row++) {
-                ImGui::TableNextRow();
+        // static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable
+        // |
+        //                                ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 
-                for (int column = 0; column < 3; column++) {
-                    ImGui::TableSetColumnIndex(column);
-                    ImGui::Text("%s %d,%d", (column == 2) ? "Stretch" : "Fixed", column, row);
-                }
-            }
-            ImGui::EndTable();
-        }
+        // if (ImGui::BeginTable("table0", 3, flags)) {
+        //     ImGui::TableSetupColumn("AAA", ImGuiTableColumnFlags_WidthFixed);
+        //     ImGui::TableSetupColumn("BBB", ImGuiTableColumnFlags_WidthFixed);
+        //     ImGui::TableSetupColumn("CCC", ImGuiTableColumnFlags_WidthStretch);
+        //     ImGui::TableHeadersRow();
+
+        //     for (int row = 0; row < 5; row++) {
+        //         ImGui::TableNextRow();
+
+        //         for (int column = 0; column < 3; column++) {
+        //             ImGui::TableSetColumnIndex(column);
+        //             ImGui::Text("%s %d,%d", (column == 2) ? "Stretch" : "Fixed", column, row);
+        //         }
+        //     }
+        //     ImGui::EndTable();
+        // }
     }
 
     bool isZBufferPreview = false;

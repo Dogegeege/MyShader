@@ -18,6 +18,7 @@ class Grid : public Object {
    public:
     Grid() { SetupGrid(); }
     void Draw(Shader& shader) override {
+        shader.use();
         glBindVertexArray(VAO);
         glLineWidth(2.0f);             // 设置线宽
         glDrawArrays(GL_LINES, 0, 6);  // 绘制三条轴线

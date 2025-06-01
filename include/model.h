@@ -8,7 +8,7 @@
 
 class Model : public Object3D {
    public:
-    Model(const std::string& path);
+    Model(const unsigned int id, const std::string& path);
 
     void Draw(Shader& shader) override;
 

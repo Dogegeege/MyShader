@@ -35,6 +35,7 @@ int main() {
 
     Shader modelShader("../../assets/shader/model.vsh", "../../assets/shader/model.fsh");
     Shader highLightContour("../../assets/shader/highlightcontour.vsh", "../../assets/shader/highlightcontour.fsh");
+    Shader pickShader("../../assets/shader/pick.vsh", "../../assets/shader/pick.fsh");
     Shader skyboxShader("../../assets/shader/skybox.vsh", "../../assets/shader/skybox.fsh");
     Shader gridShader("../../assets/shader/grid.vsh", "../../assets/shader/grid.fsh");
 
@@ -45,6 +46,7 @@ int main() {
 
     glUniformBlockBinding(modelShader.ID, uniformBlockIndexModel, 0);
     glUniformBlockBinding(highLightContour.ID, uniformBlockIndexHighLightContour, 0);
+    glUniformBlockBinding(pickShader.ID, uniformBlockIndexModel, 0);
     glUniformBlockBinding(gridShader.ID, uniformBlockIndexHighLightContour, 0);
 
     unsigned int uboMatrices;
@@ -59,7 +61,7 @@ int main() {
 
     //!--------------------------------------------------------------------
 
-    Object3D* ourModel = new Model("../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
+    Object3D* ourModel = new Model(1, "../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
 
     // 创建立方体贴图
     std::vector<std::string> skyboxFaces = {"../../assets/img/skybox/right.jpg", "../../assets/img/skybox/left.jpg",
@@ -77,7 +79,8 @@ int main() {
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 
-    glEnable(GL_CULL_FACE);  // 启用FaceCull
+    glCullFace(GL_BACK);     // 剔除背面
+    glEnable(GL_CULL_FACE);  // 启用面剔除
 
     // timing
     float deltaTime = 0.0f;  // time between current frame and last frame
@@ -89,13 +92,6 @@ int main() {
         lastFrame          = currentFrame;
 
         windowRender.processInput(deltaTime);  // IO响应
-
-        glClearColor(63.0f / 255.0f, 63.0f / 255.0f, 63.0f / 255.0f, 1);
-
-        // glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-        pFrameBuffer->Bind();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         //!--------------------------Transform--------------------------------
         model = glm::translate(glm::mat4(1.0f), ui.translate);
         model = glm::scale(model, glm::vec3(ui.scale, ui.scale, ui.scale));
@@ -109,7 +105,6 @@ int main() {
         projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f);
 
         ourModel->SetModelMatrix(model);
-
         //!--------------------------Shader--------------------------------
 
         modelShader.use();
@@ -124,6 +119,15 @@ int main() {
         // highLightContour.setMat4("view", view);
         // highLightContour.setMat4("projection", projection);
 
+        pickShader.use();
+        pickShader.setMat4("model", model);
+        pickShader.setUnsignedInt("objectID", ourModel->ID);
+
+        skyboxShader.use();
+        glm::mat4 unTransView = glm::mat4(glm::mat3(camera.GetViewMatrix()));  // remove translation from the view matrix
+        skyboxShader.setMat4("view", unTransView);
+        skyboxShader.setMat4("projection", projection);
+
         glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -131,29 +135,46 @@ int main() {
         glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
         glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
-        //!--------------------------ObjectShade--------------------------------
-        glCullFace(GL_BACK);
+        // !---------------------------拾取----------------------------------
 
-        ourModel->SetHighLight(ui.showHightLight);
+        pFrameBuffer->Bind();
+
+        // 渲染ID到拾取附件
+        GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT1};
+        glDrawBuffers(1, drawBuffers);
+
+        glClearColor(63.0f / 255.0f, 63.0f / 255.0f, 63.0f / 255.0f, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        ourModel->Draw(pickShader);
+
+        pFrameBuffer->UnBind();
+        //!--------------------------ObjectShade--------------------------------
+        pFrameBuffer->Bind();
+
+        GLenum defaultBuffers[1] = {GL_COLOR_ATTACHMENT0};
+        glDrawBuffers(1, defaultBuffers);
+
+        glClearColor(63.0f / 255.0f, 63.0f / 255.0f, 63.0f / 255.0f, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        ourModel->SetHighLight(ui.showHightLight && ui.nowID == ourModel->ID);
         ourModel->Draw(modelShader, highLightContour);
 
+        pFrameBuffer->UnBind();
         //!-------------------------------SkyBox-----------------------------------------
+        pFrameBuffer->Bind();
+
         if (ui.isSkyboxPreview == true) {
             // draw skybox as last
             glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-
-            skyboxShader.use();
-            glm::mat4 unTransView = glm::mat4(glm::mat3(camera.GetViewMatrix()));  // remove translation from the view matrix
-            skyboxShader.setMat4("view", unTransView);
-            skyboxShader.setMat4("projection", projection);
-
             skybox->Draw(skyboxShader);
-
             glDepthFunc(GL_LESS);  // set depth function back to default
         }
+        pFrameBuffer->UnBind();
 
         //!-----------------------------------axis---------------------------------
-        gridShader.use();
+        pFrameBuffer->Bind();
 
         grid.Draw(gridShader);
 
@@ -225,12 +246,9 @@ int main() {
         // ligtingVertex.bindAndDrawElements();
 #endif
 
-        pFrameBuffer->UBind();
-
+        pFrameBuffer->UnBind();
         //!-------------------------------imgui-----------------------------------------
-
         ui.RenderUI();
-
         //!---------------------------------------------------------------------
         // 处理事件
         glfwPollEvents();

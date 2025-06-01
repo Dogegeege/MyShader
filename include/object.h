@@ -9,17 +9,22 @@
 
 class Object {
    public:
-    Object() = default;
+    Object() : ID(0), name(" ") {}
+    Object(unsigned int id, const std::string& name) : ID(id), name(name) {}
     virtual ~Object() {};
 
     virtual void Draw(Shader& shader) = 0;
+    virtual void GetID(unsigned int& id) const { id = ID; }
+    virtual void GetName(std::string& name) const { name = this->name; }
 
-    std::string name;
+    unsigned int ID;  // OpenGL对象ID
+    std::string  name;
 };
 
 class Object3D : public Object {
    public:
-    Object3D() = default;
+    Object3D() : Object(0, " ") {}
+    Object3D(unsigned int id, const std::string& name) : Object(id, name) {}
     virtual ~Object3D() { loadedObject3D.erase(name); };
 
     virtual void Draw(Shader& shader) = 0;
@@ -36,12 +41,18 @@ class Object3D : public Object {
             glStencilMask(0x00);  // 禁止修改
 
             Draw(highLightShader);
-            // glEnable(GL_DEPTH_TEST);
+            //  glEnable(GL_DEPTH_TEST);
         }
 
         // *写回保证下一轮glClear可以清除模板缓存
         glStencilMask(0xFF);
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
+    }
+
+    static std::shared_ptr<Object3D> GetObject3D(const std::string& name) {
+        auto it = loadedObject3D.find(name);
+        if (it != loadedObject3D.end()) { return it->second; }
+        return nullptr;
     }
 
     virtual void      SetModelMatrix(const glm::mat4& model) { modelMatrix = model; }
@@ -50,11 +61,6 @@ class Object3D : public Object {
     virtual bool      IsHighLight() const { return isHighLight; }
 
     static std::map<std::string, std::shared_ptr<Object3D>> loadedObject3D;
-    static std::shared_ptr<Object3D>                        GetObject3D(const std::string& name) {
-        auto it = loadedObject3D.find(name);
-        if (it != loadedObject3D.end()) { return it->second; }
-        return nullptr;
-    }
 
    private:
     bool      isHighLight = false;  // 是否启用背景轮廓

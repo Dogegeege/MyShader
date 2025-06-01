@@ -19,6 +19,7 @@ class Skybox : public Object3D {
     };
 
     void Draw(Shader& shader) override {
+        shader.use();
         if (skyboxTexture.IsValid() == false) {
             std::cerr << "Skybox texture is not valid!" << std::endl;
             return;

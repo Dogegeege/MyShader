@@ -6,6 +6,7 @@
 #include <optional>
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 #include <GLFW/glfw3.h>
 
@@ -49,21 +50,34 @@ class WindowRender {
     GLFWwindow* InitWindow();
 };
 
+/**
+ * 构造函数，会直接创建一个帧缓冲
+ * @param width 帧缓冲的宽
+ * @param height 帧缓存的高
+ */
 class FrameBuffer {
    public:
-    FrameBuffer(uint32_t width, uint32_t height);
+    /**
+     * 构造函数，会直接创建一个帧缓冲
+     * @param width 帧缓冲的宽
+     * @param height 帧缓存的高
+     */
+    FrameBuffer(const uint32_t width, const uint32_t height);
     ~FrameBuffer();
-    void            Invaidate();
-    void            Resize(uint32_t width, uint32_t height);
+    void            Resize(const uint32_t width, const uint32_t height);
     inline uint32_t GetWidth() const { return m_Width; }
     inline uint32_t GetHeight() const { return m_Height; }
+    inline uint32_t GetID() const { return m_FrameBufferID; }
     inline uint32_t GetColorAttachment() const { return m_ColorAttachment; }
+    inline uint32_t GetDepthAttachment() const { return m_DepthAttachment; }
 
-    void Bind();
-    void UBind();
+    void      Bind();
+    void      UnBind();
+    glm::vec3 ReadPixel(const unsigned int x, const unsigned int y);
 
    private:
     uint32_t m_FrameBufferID, m_ColorAttachment, m_DepthAttachment;
+    uint32_t p_FBO;
     uint32_t m_Width, m_Height;
 };
 
