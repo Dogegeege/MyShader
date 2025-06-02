@@ -11,6 +11,8 @@
 #include <GLFW/glfw3.h>
 
 #include "camera.h"
+#include "input_management.h"
+#include "object.h"
 
 #define MY_GLFW_CONTEXT_VERSION_MAJOR 3
 #define MY_GLFW_CONTEXT_VERSION_MINOR 3
@@ -40,6 +42,7 @@ class WindowRender {
     int         screenWidth;
     int         screenHeight;
     std::string windowName;
+    bool        isLeftMouseButtonPressed = false;  // 是否按下左键
 
     static std::map<GLFWwindow*, Camera*> windowCameraMap;  // 静态映射表,用于回调函数
 

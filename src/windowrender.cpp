@@ -33,42 +33,38 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     auto camera = WindowRender::windowCameraMap[window];
-    if (camera->rightMouseButtonPressed == true) camera->ProcessMouseMovement(xpos, ypos);
+
+    InputInfo::GetInstance()->mouse_pos_x = static_cast<float>(xpos);
+    InputInfo::GetInstance()->mouse_pos_y = static_cast<float>(ypos);
+    Input::ProcessMouseMovement(window, *camera);
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     auto camera = WindowRender::windowCameraMap[window];
 
-    if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-        if (action == GLFW_PRESS) {
-            camera->rightMouseButtonPressed = true;  // 鼠标左键按下
-        } else if (action == GLFW_RELEASE) {
-            camera->rightMouseButtonPressed = false;  // 鼠标左键释放
-            camera->firstMouse              = true;   // 重置鼠标状态
-        }
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        InputInfo::GetInstance()->mouse_button_right = true;
+    } else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+        InputInfo::GetInstance()->mouse_button_right   = false;
+        InputInfo::GetInstance()->mouse_first_movement = true;  // 鼠标第一次移动
     }
-    if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
-        if (action == GLFW_PRESS)
-            camera->middleMouseButtonPressed = true;
-        else
-            camera->middleMouseButtonPressed = false;
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        InputInfo::GetInstance()->mouse_button_left = true;
+    } else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+        InputInfo::GetInstance()->mouse_button_left = false;
+    }
+    if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
+        InputInfo::GetInstance()->mouse_button_middle = true;
+    } else if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_RELEASE) {
+        InputInfo::GetInstance()->mouse_button_middle = false;
     }
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     auto camera = WindowRender::windowCameraMap[window];
-    if (camera->middleMouseButtonPressed == true) camera->ProcessMouseScroll(static_cast<float>(yoffset));
-}
 
-void WindowRender::processInput(float deltaTime) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true);  // 按ESC退出
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) camera->ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) camera->ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) camera->ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) camera->ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) camera->ProcessKeyboard(UP, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) camera->ProcessKeyboard(DOWN, deltaTime);
+    InputInfo::GetInstance()->mouse_wheel_y = static_cast<float>(yoffset);
+    Input::ProcessInputMouseWheel(window, *camera);
 }
 
 WindowRender::WindowRender(Camera& camera, std::string name) : windowName(name), camera(&camera), screenHeight(SCR_HEIGHT), screenWidth(SCR_WIDTH) {

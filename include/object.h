@@ -25,7 +25,7 @@ class Object3D : public Object {
    public:
     Object3D() : Object(0, " ") {}
     Object3D(unsigned int id, const std::string& name) : Object(id, name) {}
-    virtual ~Object3D() { loadedObject3D.erase(name); };
+    virtual ~Object3D() { loadedObject3D.erase(this->ID); };
 
     virtual void Draw(Shader& shader) = 0;
     virtual void Draw(Shader& shader, Shader& highLightShader) {
@@ -49,7 +49,7 @@ class Object3D : public Object {
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
     }
 
-    static std::shared_ptr<Object3D> GetObject3D(const std::string& name) {
+    static std::shared_ptr<Object3D> GetObject3D(const unsigned int name) {
         auto it = loadedObject3D.find(name);
         if (it != loadedObject3D.end()) { return it->second; }
         return nullptr;
@@ -60,7 +60,7 @@ class Object3D : public Object {
     virtual void      SetHighLight(bool isHighLight) { this->isHighLight = isHighLight; }
     virtual bool      IsHighLight() const { return isHighLight; }
 
-    static std::map<std::string, std::shared_ptr<Object3D>> loadedObject3D;
+    static std::map<unsigned int, std::shared_ptr<Object3D>> loadedObject3D;
 
    private:
     bool      isHighLight = false;  // 是否启用背景轮廓

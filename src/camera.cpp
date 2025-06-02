@@ -5,16 +5,14 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& up)
       movementSpeed(SPEED),
       mouseSensitivity(SENSITIVITY),
       zoom(ZOOM),
-      lastX(SCR_WIDTH / 2.0),
-      lastY(SCR_HEIGHT / 2.0),
+      // lastX(SCR_WIDTH / 2.0),
+      // lastY(SCR_HEIGHT / 2.0),
       yaw(YAW),
       pitch(PITCH),
       position(position),
       worldUp(up),
       aspectRatio(static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT)) {
-    firstMouse              = true;
-    rightMouseButtonPressed = false;
-    rightMouseButtonPressed = false;
+    // firstMouse = true;
 
     UpdateCameraVectors();
 }
@@ -47,25 +45,11 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
 
 /**
  * @brief 处理鼠标移动输入
- * @param xpos 鼠标x坐标
- * @param ypos 鼠标y坐标
+ * @param xoffset 鼠标x偏移量
+ * @param yoffset 鼠标y偏移量
  * @param constrainPitch 是否限制`pitch`角度(防止翻转)
  */
-void Camera::ProcessMouseMovement(double xpos, double ypos, GLboolean constrainPitch) {
-    if (firstMouse == true) {
-        lastX      = xpos;
-        lastY      = ypos;
-        firstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-    lastX         = xpos;
-    lastY         = ypos;
-
-    xoffset *= mouseSensitivity;
-    yoffset *= mouseSensitivity;
-
+void Camera::ProcessMouseMovement(double xoffset, double yoffset, bool constrainPitch) {
     yaw += xoffset;
     pitch += yoffset;
 

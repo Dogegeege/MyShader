@@ -34,7 +34,7 @@ class Camera {
     inline glm::mat4 GetViewMatrix() { return glm::lookAt(position, position + front, up); }
 
     void ProcessKeyboard(Camera_Movement direction, float deltaTime);
-    void ProcessMouseMovement(double xpos, double ypos, GLboolean constrainPitch = true);
+    void ProcessMouseMovement(double xpos, double ypos, bool constrainPitch = true);
     void ProcessMouseScroll(float yoffset);
 
     // camera options
@@ -42,10 +42,6 @@ class Camera {
     float mouseSensitivity;  // 鼠标灵敏度
     float zoom;              // 缩放视野(Field of View)
     float aspectRatio;       // 宽高比
-
-    bool rightMouseButtonPressed;
-    bool middleMouseButtonPressed;
-    bool firstMouse;
 
    private:
     // calculates the front vector from the Camera's (updated) Euler Angles
@@ -62,9 +58,5 @@ class Camera {
     // 欧拉角
     float yaw;
     float pitch;
-
-    // 上一帧鼠标位置
-    float lastX;
-    float lastY;
 };
 #endif

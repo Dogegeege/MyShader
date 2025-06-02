@@ -91,7 +91,7 @@ int main() {
         deltaTime          = currentFrame - lastFrame;
         lastFrame          = currentFrame;
 
-        windowRender.processInput(deltaTime);  // IO响应
+        Input::ProcessInputKeyBorard(windowRender.getWindow(), camera, deltaTime);  // IO响应
         //!--------------------------Transform--------------------------------
         model = glm::translate(glm::mat4(1.0f), ui.translate);
         model = glm::scale(model, glm::vec3(ui.scale, ui.scale, ui.scale));
