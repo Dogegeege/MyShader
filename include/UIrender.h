@@ -411,6 +411,10 @@ class UIRender {
         io = &ImGui::GetIO();
         (void)io;  // 获取 IO 对象
 
+        io->FontGlobalScale = 0.8f;                                   // 设置字体缩放比例
+        io->ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;      // 启用 DPI 缩放字体
+        io->ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleViewports;  // 启用 DPI 缩放视口
+
         // 这里是一些ImGui的拓展的设置
         io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
         io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls

@@ -254,7 +254,7 @@ glm::vec3 FrameBuffer::ReadPixel(const unsigned int x, const unsigned int y) {
     glReadBuffer(GL_NONE);
     this->UnBind();
 
-    std::cout << x << " " << y << " " << pixel.x << " " << pixel.y << " " << pixel.z << std::endl;
+    // std::cout << x << " " << y << " " << pixel.x << " " << pixel.y << " " << pixel.z << std::endl;
 
     return pixel;
 }
