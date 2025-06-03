@@ -55,7 +55,7 @@ class Skybox : public Object3D {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
         glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     };
 
     unsigned int   skyboxVAO, skyboxVBO;
