@@ -5,15 +5,11 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& up)
       movementSpeed(SPEED),
       mouseSensitivity(SENSITIVITY),
       zoom(ZOOM),
-      // lastX(SCR_WIDTH / 2.0),
-      // lastY(SCR_HEIGHT / 2.0),
       yaw(YAW),
       pitch(PITCH),
       position(position),
       worldUp(up),
       aspectRatio(static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT)) {
-    // firstMouse = true;
-
     UpdateCameraVectors();
 }
 
