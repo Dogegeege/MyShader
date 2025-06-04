@@ -59,6 +59,8 @@ file(GLOB THIRD_PARTY_HEADERS
     3rdParty/imgui-docking
     3rdParty/stb_image
     3rdParty/assimp/include
+    3rdParty/imguizmo
+
     ${CMAKE_BINARY_DIR}/3rdParty/assimp/include/assimp
     
 )
@@ -100,9 +102,11 @@ target_include_directories(${TARGET_NAME} PUBLIC
     3rdParty/imgui-docking
     3rdParty/stb_image
     3rdParty/assimp/include
+    3rdParty/imguizmo
+
+
     ${CMAKE_BINARY_DIR}/3rdParty/assimp/include/assimp
     
-
     #${PROJECT_HEADERS}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 
@@ -128,6 +132,7 @@ target_link_libraries(${TARGET_NAME} PUBLIC glfw)
 target_link_libraries(${TARGET_NAME} PUBLIC imgui)
 target_link_libraries(${TARGET_NAME} PUBLIC stb_image) 
 target_link_libraries(${TARGET_NAME} PUBLIC assimp)
+target_link_libraries(${TARGET_NAME} PUBLIC imguizmo)
 
 
 

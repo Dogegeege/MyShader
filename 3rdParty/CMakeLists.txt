@@ -70,3 +70,10 @@ if (NOT TARGET assimp)
     option(ASSIMP_WARNINGS_AS_ERRORS OFF)
 
 endif ()
+###############################################################################
+#imguizmo
+if (NOT TARGET imguizmo)
+    include(imguizmo.cmake)
+    set_target_properties(imguizmo PROPERTIES FOLDER ${INCLUDE_FOLDER}/imguizmo)
+
+endif()

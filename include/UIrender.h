@@ -5,6 +5,7 @@
 
 #include <glad/glad.h>
 
+#include <ImGuizmo.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <imgui.h>
@@ -138,10 +139,14 @@ class UIRender {
     ImVec2       relativePos;
     unsigned int nowID = 0;
 
+    // 你要操作的模型矩阵
+    glm::mat4* model;       // 你的模型矩阵
+    glm::mat4* view;        // 摄像机视图矩阵
+    glm::mat4* projection;  // 摄像机投影矩阵
+
     void RenderWindow() {
         HideTabBar();
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
-
         ImGui::Begin("ViewPort");
         //! 注意 获取位置 ImGui::Begin("ViewPort") 之后，ImGui::Image 之前
         viewPortSize   = ImGui::GetContentRegionAvail();  // 获取ViewPort窗口的大小
@@ -164,6 +169,23 @@ class UIRender {
 
         glm::uvec3 id = pFrameBuffer->ReadPixel(px, py);
         nowID         = id.x;
+
+        ImGuizmo::SetDrawlist();
+        ImGuizmo::SetRect(imageScreenPos.x, imageScreenPos.y, viewPortSize.x, viewPortSize.y);
+
+        // 操作类型（平移/旋转/缩放）
+        static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+        static ImGuizmo::MODE      mCurrentGizmoMode      = ImGuizmo::WORLD;
+
+        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows)) {
+            ImGuizmo::Manipulate(glm::value_ptr(*view), glm::value_ptr(*projection), mCurrentGizmoOperation, mCurrentGizmoMode,
+                                 glm::value_ptr(*model));
+        }
+        // if (ImGuizmo::IsUsing()) {
+        //     std::cout << "1\n";
+        //     // model 已被修改，应用到你的物体
+        // }
+
         ImGui::End();
     }
 
@@ -363,6 +385,8 @@ class UIRender {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        ImGuizmo::BeginFrame();
 
         // 主窗口接收参数标志位
         window_flags |= ImGuiWindowFlags_MenuBar;

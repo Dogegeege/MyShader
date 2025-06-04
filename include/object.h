@@ -49,16 +49,16 @@ class Object3D : public Object {
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
     }
 
+    virtual void      SetModelMatrix(const glm::mat4& model) { modelMatrix = model; }
+    virtual glm::mat4 GetModelMatrix() const { return modelMatrix; }
+    virtual void      SetHighLight(bool isHighLight) { this->isHighLight = isHighLight; }
+    virtual bool      IsHighLight() const { return isHighLight; }
+
     static std::shared_ptr<Object3D> GetObject3D(const unsigned int name) {
         auto it = loadedObject3D.find(name);
         if (it != loadedObject3D.end()) { return it->second; }
         return nullptr;
     }
-
-    virtual void      SetModelMatrix(const glm::mat4& model) { modelMatrix = model; }
-    virtual glm::mat4 GetModelMatrix() const { return modelMatrix; }
-    virtual void      SetHighLight(bool isHighLight) { this->isHighLight = isHighLight; }
-    virtual bool      IsHighLight() const { return isHighLight; }
 
     static std::map<unsigned int, std::shared_ptr<Object3D>> loadedObject3D;
 

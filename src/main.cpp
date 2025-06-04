@@ -4,8 +4,6 @@
 #include <memory>
 #include <vector>
 
-#include <imgui.h>
-
 #include "UIrender.h"
 #include "camera.h"
 #include "grid.h"
@@ -92,19 +90,7 @@ int main() {
         lastFrame          = currentFrame;
 
         Input::ProcessInputKeyBorard(windowRender.getWindow(), camera, deltaTime);  // IO响应
-        //!--------------------------Transform--------------------------------
-        model = glm::translate(glm::mat4(1.0f), ui.translate);
-        model = glm::scale(model, glm::vec3(ui.scale, ui.scale, ui.scale));
 
-        glm::quat quatX = glm::angleAxis(ui.rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));  // X 轴旋转四元数
-        glm::quat quatY = glm::angleAxis(ui.rotate.y, glm::vec3(0.0f, 1.0f, 0.0f));  // Y 轴旋转四元数
-        glm::quat quatZ = glm::angleAxis(ui.rotate.z, glm::vec3(0.0f, 0.0f, 1.0f));  // Z 轴旋转四元数
-
-        model *= glm::mat4_cast(quatZ * quatY * quatX);
-        view       = camera.GetViewMatrix();
-        projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f);
-
-        ourModel->SetModelMatrix(model);
         //!--------------------------Shader--------------------------------
 
         modelShader.use();
@@ -247,6 +233,33 @@ int main() {
 #endif
 
         pFrameBuffer->UnBind();
+
+        //!--------------------------Transform--------------------------------
+        // 只在 ImGuizmo 没有被操作时，用 UI 控件重建 model
+        if (ImGuizmo::IsUsing() == false) {
+            // std::cout << "ImGuizmo is not using" << std::endl;
+            model           = glm::translate(glm::mat4(1.0f), ui.translate);
+            model           = glm::scale(model, glm::vec3(ui.scale, ui.scale, ui.scale));
+            glm::quat quatX = glm::angleAxis(glm::radians(ui.rotate.x), glm::vec3(1, 0, 0));
+            glm::quat quatY = glm::angleAxis(glm::radians(ui.rotate.y), glm::vec3(0, 1, 0));
+            glm::quat quatZ = glm::angleAxis(glm::radians(ui.rotate.z), glm::vec3(0, 0, 1));
+            model *= glm::mat4_cast(quatZ * quatY * quatX);
+        } else {
+            // ImGuizmo 正在操作时，把 model 拆分同步到 UI 控件
+            glm::vec3 translation, rotation, scale;
+            ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), &translation.x, &rotation.x, &scale.x);
+            ui.translate = translation;
+            ui.rotate    = rotation;
+            ui.scale     = scale.x;  // 假设均匀缩放
+        }
+        view       = camera.GetViewMatrix();
+        projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f);
+
+        ui.model      = &model;       // 传递模型矩阵
+        ui.view       = &view;        // 传递摄像机视图矩阵
+        ui.projection = &projection;  // 传递摄像机投影矩阵
+
+        ourModel->SetModelMatrix(model);
         //!-------------------------------imgui-----------------------------------------
         ui.RenderUI();
         //!---------------------------------------------------------------------
