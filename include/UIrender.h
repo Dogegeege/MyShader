@@ -27,7 +27,7 @@ class UIRender {
     }
     UIRender(WindowRender* windowRender, Camera& camera, FrameBuffer* pFrameBuffer) : UIRender(*windowRender, camera, pFrameBuffer) {}
     ~UIRender() {
-        if (ImGui::GetCurrentContext() == true) {
+        if (ImGui::GetCurrentContext()) {
             ImGui_ImplOpenGL3_Shutdown();
             ImGui_ImplGlfw_Shutdown();
             ImGui::DestroyContext();
