@@ -27,9 +27,11 @@ class UIRender {
     }
     UIRender(WindowRender* windowRender, Camera& camera, FrameBuffer* pFrameBuffer) : UIRender(*windowRender, camera, pFrameBuffer) {}
     ~UIRender() {
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
+        if (ImGui::GetCurrentContext() == true) {
+            ImGui_ImplOpenGL3_Shutdown();
+            ImGui_ImplGlfw_Shutdown();
+            ImGui::DestroyContext();
+        }
         delete model;
         delete view;
         delete projection;

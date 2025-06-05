@@ -80,10 +80,10 @@ int main() {
     float deltaTime = 0.0f;  // time between current frame and last frame
     float lastFrame = 0.0f;
 
-        while (glfwWindowShouldClose(windowRender.getWindow()) == false) {
-            float currentFrame = static_cast<float>(glfwGetTime());
-            deltaTime          = currentFrame - lastFrame;
-            lastFrame          = currentFrame;
+    while (glfwWindowShouldClose(windowRender.getWindow()) == false) {
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime          = currentFrame - lastFrame;
+        lastFrame          = currentFrame;
 
         glm::mat4& model      = *ui.model;
         glm::mat4& view       = *ui.view;
@@ -240,17 +240,11 @@ int main() {
         //!-------------------------------imgui-----------------------------------------
         ui.Render();
         //!---------------------------------------------------------------------
-        // 处理事件
-        glfwPollEvents();
-
-        // 交换缓冲
-        glfwSwapBuffers(windowRender.getWindow());
+        glfwPollEvents();                           // 处理事件
+        glfwSwapBuffers(windowRender.getWindow());  // 交换缓冲
     }
-
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
-    windowRender.~WindowRender();  // 显式写出
+    // 显式写出
+    ui.~UIRender();
+    windowRender.~WindowRender();
     return 0;
 }
