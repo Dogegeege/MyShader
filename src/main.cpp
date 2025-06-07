@@ -14,16 +14,13 @@
 #include "texture.h"
 #include "windowrender.h"
 
-Camera       camera(glm::vec3(0.0f, 0.0f, 3.0f));
-WindowRender windowRender(camera, "LearnOpenGL");
-
 int main() {
     //!--------------------------加载资源----------------------------------
+    Camera       camera(glm::vec3(0.0f, 0.0f, 3.0f));
+    WindowRender windowRender(camera, "LearnOpenGL");
     FrameBuffer* pFrameBuffer = new FrameBuffer(640, 480);
-
-    UIRender ui(windowRender, camera, pFrameBuffer);
-
-    Grid grid;
+    UIRender     ui(windowRender, camera, pFrameBuffer);
+    Grid         grid;
 
     //!--------------------------着色器----------------------------------
 
@@ -76,20 +73,13 @@ int main() {
     glCullFace(GL_BACK);     // 剔除背面
     glEnable(GL_CULL_FACE);  // 启用面剔除
 
-    // timing
-    float deltaTime = 0.0f;  // time between current frame and last frame
-    float lastFrame = 0.0f;
-
     while (glfwWindowShouldClose(windowRender.getWindow()) == false) {
-        float currentFrame = static_cast<float>(glfwGetTime());
-        deltaTime          = currentFrame - lastFrame;
-        lastFrame          = currentFrame;
-
         glm::mat4& model      = *ui.model;
         glm::mat4& view       = *ui.view;
         glm::mat4& projection = *ui.projection;
 
-        Input::ProcessInputKeyBorard(windowRender.getWindow(), camera, deltaTime);  // IO响应
+        InputInfo::GetInstance()->TimeUpdate(static_cast<float>(glfwGetTime()));                              // 更新输入时间
+        Input::ProcessInputKeyBorard(windowRender.getWindow(), camera, InputInfo::GetInstance()->deltaTime);  // IO响应
 
         //!--------------------------Shader--------------------------------
 
@@ -129,8 +119,9 @@ int main() {
         GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT1};
         glDrawBuffers(1, drawBuffers);
 
-        glClearColor(63.0f / 255.0f, 63.0f / 255.0f, 63.0f / 255.0f, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        const GLuint clearColor[3] = {0, 0, 0};
+        glClearBufferuiv(GL_COLOR, 0, clearColor);  // 清除 drawBuffers 0号索引内容
+        glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         ourModel->Draw(pickShader);
 
@@ -144,7 +135,7 @@ int main() {
         glClearColor(63.0f / 255.0f, 63.0f / 255.0f, 63.0f / 255.0f, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        ourModel->SetHighLight(ui.showHightLight && ui.nowID == ourModel->ID);
+        ourModel->SetHighLight(ui.showHightLight && ui.selectedID == ourModel->ID);
         ourModel->Draw(modelShader, highLightContour);
 
         pFrameBuffer->UnBind();

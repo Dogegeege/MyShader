@@ -26,25 +26,22 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 class WindowRender {
    public:
-    WindowRender(Camera& camera, std::string name);
-
-    void processInput(float deltaTime);
-
-    inline GLFWwindow* getWindow() const { return window; }
-    inline void        GetScreenSize(int& width, int& height);
-
+    WindowRender(Camera& camera, const std::string& name);
     virtual ~WindowRender() {
         windowCameraMap.erase(window);
         glfwDestroyWindow(window);
         glfwTerminate();
     };
 
+    inline GLFWwindow* getWindow() const { return window; }
+    void               GetScreenSize(int& width, int& height);
+
+    static std::map<GLFWwindow*, Camera*> windowCameraMap;  // 静态映射表,用于回调函数
+
     int         screenWidth;
     int         screenHeight;
     std::string windowName;
     bool        isLeftMouseButtonPressed = false;  // 是否按下左键
-
-    static std::map<GLFWwindow*, Camera*> windowCameraMap;  // 静态映射表,用于回调函数
 
    private:
     GLFWwindow* window;

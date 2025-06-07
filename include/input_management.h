@@ -26,7 +26,11 @@ class InputInfo : public Singleton<InputInfo> {
         mouse_lastpos_x = mouse_pos_x;
         mouse_lastpos_y = mouse_pos_y;
     }
-
+    void TimeUpdate(const float& currentTime = 0.0f) {
+        float currentFrame = currentTime;
+        deltaTime          = currentFrame - lastFrame;
+        lastFrame          = currentFrame;
+    }
     float mouse_pos_x;
     float mouse_pos_y;
 
@@ -43,10 +47,15 @@ class InputInfo : public Singleton<InputInfo> {
     bool mouse_button_middle;
     bool mouse_button_right;
 
+    // timing
+    float deltaTime = 0.0f;  // time between current frame and last frame
+
    private:
     static InputInfo* inputInfo_instance;
     float             mouse_lastpos_x;
     float             mouse_lastpos_y;
+
+    float lastFrame = 0.0f;
 };
 namespace Input {
 static void ProcessInputKeyBorard(GLFWwindow* window, Camera& camera, float deltaTime) {

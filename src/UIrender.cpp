@@ -122,51 +122,12 @@ void UIRender::ViewPortRender() {
     mousePos       = ImGui::GetMousePos();
     relativePos    = ImVec2(mousePos.x - imageScreenPos.x, mousePos.y - imageScreenPos.y);
 
-    // ViewPort窗口大小如果有改变，那么需要重置帧缓冲区
-    if (viewPortSize.x * viewPortSize.y > 0 && (viewPortSize.x != pFrameBuffer->GetWidth() || viewPortSize.y != pFrameBuffer->GetHeight())) {
-        pFrameBuffer->Resize(viewPortSize.x, viewPortSize.y);
-        framebuffer_size_callback(windowRender.getWindow(), pFrameBuffer->GetWidth(), pFrameBuffer->GetHeight());
-    }
-    // 获取颜色纹理的ID
-    unsigned int textureID = pFrameBuffer->GetColorAttachment();
+    InitViewPort();
+
+    unsigned int textureID = pFrameBuffer->GetColorAttachment();  // 获取颜色纹理的ID
     ImGui::Image(textureID, viewPortSize, {0, 1}, {1, 0});
 
-    // OpenGL坐标Y轴翻转
-    unsigned int px = static_cast<unsigned int>(relativePos.x);
-    unsigned int py = pFrameBuffer->GetHeight() - static_cast<unsigned int>(relativePos.y) - 1;
-    glm::uvec3   id = pFrameBuffer->ReadPixel(px, py);
-    nowID           = id.x;
-
-    ImGuizmo::SetDrawlist();
-    ImGuizmo::SetRect(imageScreenPos.x, imageScreenPos.y, viewPortSize.x, viewPortSize.y);
-
-    // 操作类型（平移/旋转/缩放）
-    static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-    static ImGuizmo::MODE      mCurrentGizmoMode      = ImGuizmo::WORLD;
-
-    // 只在 ImGuizmo 没有被操作时，用 UI 控件重建 model
-    if (ImGuizmo::IsUsing() == false) {
-        *model          = glm::translate(glm::mat4(1.0f), translate);
-        *model          = glm::scale(*model, glm::vec3(scale, scale, scale));
-        glm::quat quatX = glm::angleAxis(glm::radians(rotate.x), glm::vec3(1, 0, 0));
-        glm::quat quatY = glm::angleAxis(glm::radians(rotate.y), glm::vec3(0, 1, 0));
-        glm::quat quatZ = glm::angleAxis(glm::radians(rotate.z), glm::vec3(0, 0, 1));
-        *model *= glm::mat4_cast(quatZ * quatY * quatX);
-    } else {
-        glm::vec3 scaleX;
-        // ImGuizmo 正在操作时，把 model 拆分同步到 UI 控件
-        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*model), &translate.x, &rotate.x, &scaleX.x);
-
-        scale = scaleX.x;  // 假设均匀缩放
-    }
-    *view       = camera.GetViewMatrix();
-    *projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f);
-
-    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows)) {
-        ImGuizmo::Manipulate(glm::value_ptr(*this->view), glm::value_ptr(*this->projection), mCurrentGizmoOperation, mCurrentGizmoMode,
-                             glm::value_ptr(*this->model));
-    }
-
+    ProcessPicking();  // 处理拾取逻辑
     ImGui::End();
 }
 
@@ -259,12 +220,12 @@ void UIRender::ShowMainView() {
 void UIRender::ShowPageView0() {
     ImGui::Text("调试参数:%d , %d", FirstIdx, SecondIdx);
 
-    ImGui::Text("渲染窗口大小 %f %f ", viewPortSize.x, viewPortSize.y);
-    ImGui::Text("渲染窗口左上角坐标 %f %f ", imageScreenPos.x, imageScreenPos.y);
+    ImGui::Text("渲染窗口大小 %.3f %.3f ", viewPortSize.x, viewPortSize.y);
+    ImGui::Text("渲染窗口左上角坐标 %.3f %.3f ", imageScreenPos.x, imageScreenPos.y);
 
-    ImGui::Text("鼠标坐标 %f %f ", mousePos.x, mousePos.y);
-    ImGui::Text("相对坐标 %f %f ", relativePos.x, relativePos.y);
-    ImGui::Text("鼠标当前ID %d ", nowID);
+    ImGui::Text("鼠标坐标 %.3f %.3f ", mousePos.x, mousePos.y);
+    ImGui::Text("相对坐标 %.3f %.3f ", relativePos.x, relativePos.y);
+    ImGui::Text("鼠标当前ID %d , %d", clickedID, selectedID);
 
     // // 一个表格示例
 
@@ -384,5 +345,88 @@ void UIRender::Render() {
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
         glfwMakeContextCurrent(backup_current_context);
+    }
+}
+
+void UIRender::UIInit() {
+    IMGUI_CHECKVERSION();    // 检查 ImGui 版本
+    ImGui::CreateContext();  // 创建 ImGui 上下文
+    io = &ImGui::GetIO();
+    (void)io;  // 获取 IO 对象
+
+    io->FontGlobalScale = 0.8f;                                   // 设置字体缩放比例
+    io->ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;      // 启用 DPI 缩放字体
+    io->ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleViewports;  // 启用 DPI 缩放视口
+
+    // 这里是一些ImGui的拓展的设置
+    io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+    io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+    io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // 启用窗口停靠
+    io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // 多窗口渲染
+    io->ConfigViewportsNoAutoMerge   = true;                //?禁用窗口合并
+    io->ConfigViewportsNoTaskBarIcon = false;               // 启用后，所有子视口窗口将不显示独立的任务栏图标
+    // 中文的设置，记得将main.cpp的文件编码类型改为UTF-8
+    ImFont* font = io->Fonts->AddFontFromFileTTF("C:\\\\Windows\\\\Fonts\\\\msyh.ttc", 30.f, nullptr, io->Fonts->GetGlyphRangesChineseFull());
+
+    // 判断字体加载成功
+    IM_ASSERT(font != nullptr);
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        // 直角边框
+        style.WindowRounding              = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
+
+    ImGui::StyleColorsClassic();                                         // 设置暗色主题
+    ImGui_ImplGlfw_InitForOpenGL(this->windowRender.getWindow(), true);  // 初始化 GLFW 后端
+    ImGui_ImplOpenGL3_Init("#version 330");                              // 初始化 OpenGL3 后端
+}
+
+void UIRender::InitViewPort() {
+    // ViewPort窗口大小如果有改变，需要重置帧缓冲区
+    if (viewPortSize.x * viewPortSize.y > 0 && (viewPortSize.x != pFrameBuffer->GetWidth() || viewPortSize.y != pFrameBuffer->GetHeight())) {
+        pFrameBuffer->Resize(viewPortSize.x, viewPortSize.y);
+        framebuffer_size_callback(windowRender.getWindow(), pFrameBuffer->GetWidth(), pFrameBuffer->GetHeight());
+    }
+}
+
+void UIRender::ProcessPicking() {
+    // OpenGL坐标Y轴翻转
+    unsigned int px = static_cast<unsigned int>(relativePos.x);
+    unsigned int py = pFrameBuffer->GetHeight() - static_cast<unsigned int>(relativePos.y) - 1;
+    glm::uvec3   id = pFrameBuffer->ReadPixel(px, py);
+    clickedID       = id.x;
+
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGuizmo::IsOver() == false) { selectedID = clickedID; }
+    ImGuizmo::SetDrawlist();
+    ImGuizmo::SetRect(imageScreenPos.x, imageScreenPos.y, viewPortSize.x, viewPortSize.y);
+
+    // 操作类型（平移/旋转/缩放）
+    static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+    static ImGuizmo::MODE      mCurrentGizmoMode      = ImGuizmo::WORLD;
+
+    // 只在 ImGuizmo 没有被操作时，用 UI 控件重建 model
+    if (ImGuizmo::IsUsing() == false) {
+        *model          = glm::translate(glm::mat4(1.0f), translate);
+        *model          = glm::scale(*model, glm::vec3(scale, scale, scale));
+        glm::quat quatX = glm::angleAxis(glm::radians(rotate.x), glm::vec3(1, 0, 0));
+        glm::quat quatY = glm::angleAxis(glm::radians(rotate.y), glm::vec3(0, 1, 0));
+        glm::quat quatZ = glm::angleAxis(glm::radians(rotate.z), glm::vec3(0, 0, 1));
+        *model *= glm::mat4_cast(quatZ * quatY * quatX);
+    } else {
+        glm::vec3 scaleX;
+        // ImGuizmo 正在操作时，把 model 拆分同步到 UI 控件
+        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*model), &translate.x, &rotate.x, &scaleX.x);
+
+        scale = scaleX.x;  // 假设均匀缩放
+    }
+    *view       = camera.GetViewMatrix();
+    *projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f);
+
+    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows) &&
+        selectedID != 0) {
+        ImGuizmo::Manipulate(glm::value_ptr(*this->view), glm::value_ptr(*this->projection), mCurrentGizmoOperation, mCurrentGizmoMode,
+                             glm::value_ptr(*this->model));
     }
 }

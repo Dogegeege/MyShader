@@ -67,12 +67,13 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     Input::ProcessInputMouseWheel(window, *camera);
 }
 
-WindowRender::WindowRender(Camera& camera, std::string name) : windowName(name), camera(&camera), screenHeight(SCR_HEIGHT), screenWidth(SCR_WIDTH) {
+WindowRender::WindowRender(Camera& camera, const std::string& name)
+    : windowName(name), camera(&camera), screenHeight(SCR_HEIGHT), screenWidth(SCR_WIDTH) {
     window = InitWindow();
     windowCameraMap.insert({window, &camera});
 }
 
-inline void WindowRender::GetScreenSize(int& width, int& height) {
+void WindowRender::GetScreenSize(int& width, int& height) {
     GLFWmonitor*       primaryMonitor = glfwGetPrimaryMonitor();  // 获取主显示器
     const GLFWvidmode* mode           = glfwGetVideoMode(primaryMonitor);
     width                             = mode->width;
@@ -85,7 +86,7 @@ GLFWwindow* WindowRender::InitWindow() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, MY_GLFW_CONTEXT_VERSION_MINOR);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);  // 启用透明窗口（需系统支持）
-    // glfwWindowHint(GLFW_DECORATED, GL_FALSE);  // 无边框
+                                                              // glfwWindowHint(GLFW_DECORATED, GL_FALSE);  // 无边框
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
