@@ -13,10 +13,13 @@ class Object {
     Object(unsigned int id, const std::string& name) : ID(id), name(name) {}
     virtual ~Object() {};
 
-    virtual void Draw(Shader& shader) = 0;
-    virtual void GetID(unsigned int& id) const { id = ID; }
-    virtual void GetName(std::string& name) const { name = this->name; }
+    virtual void         Draw(Shader& shader) = 0;
+    virtual void         SetID(unsigned int& id) { id = ID; }
+    virtual unsigned int GetID() const { return ID; }
+    virtual void         SetName(std::string& name) { name = this->name; }
+    virtual std::string  GetName() const { return name; }
 
+   private:
     unsigned int ID;  // OpenGL对象ID
     std::string  name;
 };
@@ -25,7 +28,7 @@ class Object3D : public Object {
    public:
     Object3D() : Object(0, " ") {}
     Object3D(unsigned int id, const std::string& name) : Object(id, name) {}
-    virtual ~Object3D() { loadedObject3D.erase(this->ID); };
+    virtual ~Object3D() { loadedObject3D.erase(this->GetID()); };
 
     virtual void Draw(Shader& shader) = 0;
     virtual void Draw(Shader& shader, Shader& highLightShader) {
@@ -34,7 +37,7 @@ class Object3D : public Object {
         Draw(shader);
 
         // 外层轮廓
-        if (isHighLight == true) {
+        if (IsHighLight() == true) {
             //?如果禁用深度测试,则外层轮廓呈现透视状态
             // glDisable(GL_DEPTH_TEST);
             glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -49,22 +52,26 @@ class Object3D : public Object {
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
     }
 
-    virtual void      SetModelMatrix(const glm::mat4& model) { modelMatrix = model; }
-    virtual glm::mat4 GetModelMatrix() const { return modelMatrix; }
-    virtual void      SetHighLight(bool isHighLight) { this->isHighLight = isHighLight; }
-    virtual bool      IsHighLight() const { return isHighLight; }
-
-    static std::shared_ptr<Object3D> GetObject3D(const unsigned int name) {
-        auto it = loadedObject3D.find(name);
+    virtual void                     SetModelMatrix(const glm::mat4& model) { modelMatrix = model; }
+    virtual glm::mat4                GetModelMatrix() const { return modelMatrix; }
+    virtual glm::mat4*               GetModelMatrixPointer() { return &modelMatrix; }
+    virtual void                     SetHighLight(bool isHighLight) { this->isHighLight = isHighLight; }
+    virtual bool                     IsHighLight() const { return isHighLight; }
+    static std::shared_ptr<Object3D> GetObject3D(const unsigned int ID) {
+        auto it = loadedObject3D.find(ID);
         if (it != loadedObject3D.end()) { return it->second; }
         return nullptr;
     }
 
     static std::map<unsigned int, std::shared_ptr<Object3D>> loadedObject3D;
 
-   private:
-    bool      isHighLight = false;  // 是否启用背景轮廓
     glm::mat4 modelMatrix = glm::mat4(1.0f);
+    glm::vec3 translate   = glm::vec3(0.0f);
+    glm::vec3 rotate      = glm::vec3(0.0f);  // 角度制
+    float     scale       = 1.0f;
+
+   private:
+    bool isHighLight = false;  // 是否启用背景轮廓
 };
 
 #endif  // OBJECT_H

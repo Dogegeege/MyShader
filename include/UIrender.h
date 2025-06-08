@@ -20,7 +20,6 @@ class UIRender {
    public:
     UIRender(WindowRender& windowRender, Camera& camera, FrameBuffer* pFrameBuffer)
         : windowRender(windowRender), camera(camera), pFrameBuffer(pFrameBuffer) {
-        model      = new glm::mat4(glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f)));
         view       = new glm::mat4(camera.GetViewMatrix());
         projection = new glm::mat4(glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f));
         UIInit();
@@ -58,12 +57,9 @@ class UIRender {
     unsigned int clickedID  = 0;
     unsigned int selectedID = 0;  // 0 表示未选中
 
-    glm::mat4* model;
-    glm::mat4* view;
-    glm::mat4* projection;
-    glm::vec3  translate = glm::vec3(0.0f);
-    glm::vec3  rotate    = glm::vec3(0.0f);  // 角度制
-    float      scale     = 1.0f;
+    glm::mat4*                view;
+    glm::mat4*                projection;
+    std::shared_ptr<Object3D> selectedObject = nullptr;  // 当前选中的物体
 
     bool isZBufferPreview = false;
     bool isSkyboxPreview  = true;

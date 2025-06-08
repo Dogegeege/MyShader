@@ -51,10 +51,17 @@ int main() {
     glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
 
     //!--------------------------------------------------------------------
+    auto ourModel = std::make_shared<Model>(1, "../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
+    auto bunny    = std::make_shared<Model>(2, "../../assets/model/bunny/bunny.obj");
+    std::vector<std::shared_ptr<Object3D>> objects;
+    objects.push_back(ourModel);
+    objects.push_back(bunny);
+    Object3D::loadedObject3D.insert({ourModel->GetID(), ourModel});
+    Object3D::loadedObject3D.insert({bunny->GetID(), bunny});
 
-    Object3D* ourModel = new Model(1, "../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
+    // std::cout << ourModel.get() << "   " << objects[0].get() << "   " << Object3D::loadedObject3D[ourModel->GetID()].get() << std::endl;
 
-    // 创建立方体贴图
+    //  创建立方体贴图
     std::vector<std::string> skyboxFaces = {"../../assets/img/skybox/right.jpg", "../../assets/img/skybox/left.jpg",
                                             "../../assets/img/skybox/top.jpg",   "../../assets/img/skybox/bottom.jpg",
                                             "../../assets/img/skybox/front.jpg", "../../assets/img/skybox/back.jpg"};
@@ -74,7 +81,6 @@ int main() {
     glEnable(GL_CULL_FACE);  // 启用面剔除
 
     while (glfwWindowShouldClose(windowRender.getWindow()) == false) {
-        glm::mat4& model      = *ui.model;
         glm::mat4& view       = *ui.view;
         glm::mat4& projection = *ui.projection;
 
@@ -82,22 +88,6 @@ int main() {
         Input::ProcessInputKeyBorard(windowRender.getWindow(), camera, InputInfo::GetInstance()->deltaTime);  // IO响应
 
         //!--------------------------Shader--------------------------------
-
-        modelShader.use();
-        modelShader.setMat4("model", model);
-        // modelShader.setMat4("view", view);
-        // modelShader.setMat4("projection", projection);
-
-        modelShader.setBool("isZBufferPreview", ui.isZBufferPreview);
-
-        highLightContour.use();
-        highLightContour.setMat4("model", model);
-        // highLightContour.setMat4("view", view);
-        // highLightContour.setMat4("projection", projection);
-
-        pickShader.use();
-        pickShader.setMat4("model", model);
-        pickShader.setUnsignedInt("objectID", ourModel->ID);
 
         skyboxShader.use();
         glm::mat4 unTransView = glm::mat4(glm::mat3(camera.GetViewMatrix()));  // remove translation from the view matrix
@@ -123,7 +113,13 @@ int main() {
         glClearBufferuiv(GL_COLOR, 0, clearColor);  // 清除 drawBuffers 0号索引内容
         glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        ourModel->Draw(pickShader);
+        for (auto object : objects) {
+            pickShader.use();
+            pickShader.setMat4("model", object->modelMatrix);
+            pickShader.setUnsignedInt("objectID", object->GetID());
+
+            object->Draw(pickShader);
+        }
 
         pFrameBuffer->UnBind();
         //!--------------------------ObjectShade--------------------------------
@@ -135,8 +131,17 @@ int main() {
         glClearColor(63.0f / 255.0f, 63.0f / 255.0f, 63.0f / 255.0f, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        ourModel->SetHighLight(ui.showHightLight && ui.selectedID == ourModel->ID);
-        ourModel->Draw(modelShader, highLightContour);
+        for (auto object : objects) {
+            modelShader.use();
+            modelShader.setMat4("model", object->modelMatrix);
+            modelShader.setBool("isZBufferPreview", ui.isZBufferPreview);
+
+            highLightContour.use();
+            highLightContour.setMat4("model", object->modelMatrix);
+
+            object->SetHighLight(ui.showHightLight && ui.selectedID == object->GetID());
+            object->Draw(modelShader, highLightContour);
+        }
 
         pFrameBuffer->UnBind();
         //!-------------------------------SkyBox-----------------------------------------
@@ -225,9 +230,6 @@ int main() {
 
         pFrameBuffer->UnBind();
 
-        //!--------------------------Transform--------------------------------
-
-        ourModel->SetModelMatrix(model);
         //!-------------------------------imgui-----------------------------------------
         ui.Render();
         //!---------------------------------------------------------------------

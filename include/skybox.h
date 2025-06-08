@@ -9,7 +9,7 @@
 class Skybox : public Object3D {
    public:
     Skybox(const std::vector<std::string>& skyboxFaces, std::string name = "Skybox") : Object3D(), skyboxTexture(skyboxFaces, "skybox") {
-        this->name = name;
+        this->SetName(name);
         SetupSkybox(name);
     };
     ~Skybox() {

@@ -157,40 +157,41 @@ void UIRender::ShowTreeView() {
     }
     if (ImGui::TreeNodeEx("物体", node_flags_outer)) {
         if (ImGui::TreeNodeEx("变换", node_flags_inner)) {
-            ImGui::SeparatorText("位置 ");
+            if (selectedObject != nullptr) {
+                ImGui::SeparatorText("位置 ");
 
-            ImGui::Text("平移");
-            ImGui::SameLine();
-            ImGui::DragFloat3("##TRANSLATE", &translate.x, 0.1f, -999.0f, 999.0f, "%.3f");
+                ImGui::Text("平移");
+                ImGui::SameLine();
+                ImGui::DragFloat3("##TRANSLATE", &selectedObject->translate.x, 0.1f, -999.0f, 999.0f, "%.3f");
 
-            // ImGui::Text("X");
-            // ImGui::SameLine();
-            // ImGui::InputFloat("##TRANSLATE_X", &translate.x, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
-            // ImGui::Text("Y");
-            // ImGui::SameLine();
-            // ImGui::InputFloat("##TRANSLATE_Y", &translate.y, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
-            // ImGui::Text("Z");
-            // ImGui::SameLine();
-            // ImGui::InputFloat("##TRANSLATE_Z", &translate.z, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
+                // ImGui::Text("X");
+                // ImGui::SameLine();
+                // ImGui::InputFloat("##TRANSLATE_X", &translate.x, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
+                // ImGui::Text("Y");
+                // ImGui::SameLine();
+                // ImGui::InputFloat("##TRANSLATE_Y", &translate.y, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
+                // ImGui::Text("Z");
+                // ImGui::SameLine();
+                // ImGui::InputFloat("##TRANSLATE_Z", &translate.z, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
 
-            ImGui::Text("旋转");
-            ImGui::SameLine();
-            ImGui::DragFloat3("##ROTATE", &rotate.x, 0.1f, -999.0f, 999.0f, "%.3f");
+                ImGui::Text("旋转");
+                ImGui::SameLine();
+                ImGui::DragFloat3("##ROTATE", &selectedObject->rotate.x, 0.1f, -999.0f, 999.0f, "%.3f");
 
-            // ImGui::Text("X");
-            // ImGui::SameLine();
-            // ImGui::InputFloat("##ROTATE_X", &rotate.x, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
-            // ImGui::Text("Y");
-            // ImGui::SameLine();
-            // ImGui::InputFloat("##ROTATE_Y", &rotate.y, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
-            // ImGui::Text("Z");
-            // ImGui::SameLine();
-            // ImGui::InputFloat("##ROTATE_Z", &rotate.z, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
+                // ImGui::Text("X");
+                // ImGui::SameLine();
+                // ImGui::InputFloat("##ROTATE_X", &rotate.x, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
+                // ImGui::Text("Y");
+                // ImGui::SameLine();
+                // ImGui::InputFloat("##ROTATE_Y", &rotate.y, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
+                // ImGui::Text("Z");
+                // ImGui::SameLine();
+                // ImGui::InputFloat("##ROTATE_Z", &rotate.z, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
 
-            ImGui::Text("缩放");
-            ImGui::SameLine();
-            ImGui::DragFloat("##SCALE", &scale, 0.01f, 0.001f, 100.0f, "%.3f");
-
+                ImGui::Text("缩放");
+                ImGui::SameLine();
+                ImGui::DragFloat("##SCALE", &selectedObject->scale, 0.01f, 0.001f, 100.0f, "%.3f");
+            }
             ImGui::TreePop();
         }
         if (ImGui::TreeNodeEx("Other", node_flags_inner)) { ImGui::TreePop(); }
@@ -378,7 +379,7 @@ void UIRender::UIInit() {
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
 
-    ImGui::StyleColorsClassic();                                         // 设置暗色主题
+    ImGui::StyleColorsLight();                                           // 设置暗色主题
     ImGui_ImplGlfw_InitForOpenGL(this->windowRender.getWindow(), true);  // 初始化 GLFW 后端
     ImGui_ImplOpenGL3_Init("#version 330");                              // 初始化 OpenGL3 后端
 }
@@ -393,40 +394,48 @@ void UIRender::InitViewPort() {
 
 void UIRender::ProcessPicking() {
     // OpenGL坐标Y轴翻转
-    unsigned int px = static_cast<unsigned int>(relativePos.x);
-    unsigned int py = pFrameBuffer->GetHeight() - static_cast<unsigned int>(relativePos.y) - 1;
-    glm::uvec3   id = pFrameBuffer->ReadPixel(px, py);
-    clickedID       = id.x;
-
-    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGuizmo::IsOver() == false) { selectedID = clickedID; }
-    ImGuizmo::SetDrawlist();
-    ImGuizmo::SetRect(imageScreenPos.x, imageScreenPos.y, viewPortSize.x, viewPortSize.y);
-
+    unsigned int px                                   = static_cast<unsigned int>(relativePos.x);
+    unsigned int py                                   = pFrameBuffer->GetHeight() - static_cast<unsigned int>(relativePos.y) - 1;
+    glm::uvec3   id                                   = pFrameBuffer->ReadPixel(px, py);
+    clickedID                                         = id.x;
     // 操作类型（平移/旋转/缩放）
     static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
     static ImGuizmo::MODE      mCurrentGizmoMode      = ImGuizmo::WORLD;
 
-    // 只在 ImGuizmo 没有被操作时，用 UI 控件重建 model
-    if (ImGuizmo::IsUsing() == false) {
-        *model          = glm::translate(glm::mat4(1.0f), translate);
-        *model          = glm::scale(*model, glm::vec3(scale, scale, scale));
-        glm::quat quatX = glm::angleAxis(glm::radians(rotate.x), glm::vec3(1, 0, 0));
-        glm::quat quatY = glm::angleAxis(glm::radians(rotate.y), glm::vec3(0, 1, 0));
-        glm::quat quatZ = glm::angleAxis(glm::radians(rotate.z), glm::vec3(0, 0, 1));
-        *model *= glm::mat4_cast(quatZ * quatY * quatX);
-    } else {
-        glm::vec3 scaleX;
-        // ImGuizmo 正在操作时，把 model 拆分同步到 UI 控件
-        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(*model), &translate.x, &rotate.x, &scaleX.x);
-
-        scale = scaleX.x;  // 假设均匀缩放
-    }
     *view       = camera.GetViewMatrix();
     *projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f);
 
-    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows) &&
-        selectedID != 0) {
-        ImGuizmo::Manipulate(glm::value_ptr(*this->view), glm::value_ptr(*this->projection), mCurrentGizmoOperation, mCurrentGizmoMode,
-                             glm::value_ptr(*this->model));
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGuizmo::IsOver() == false &&
+        ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) == true &&
+        ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows) == true) {
+        selectedID     = clickedID;
+        selectedObject = Object3D::GetObject3D(selectedID);
+    }
+    if (selectedObject == nullptr || selectedID == 0) { return; }
+    glm::mat4& model     = selectedObject->modelMatrix;
+    glm::vec3& translate = selectedObject->translate;
+    glm::vec3& rotate    = selectedObject->rotate;  // 角度制
+    float&     scale     = selectedObject->scale;
+
+    ImGuizmo::SetDrawlist();
+    ImGuizmo::SetRect(imageScreenPos.x, imageScreenPos.y, viewPortSize.x, viewPortSize.y);
+
+    ImGuizmo::Manipulate(glm::value_ptr(*this->view), glm::value_ptr(*this->projection), mCurrentGizmoOperation, mCurrentGizmoMode,
+                         glm::value_ptr(model));
+
+    // 只在 ImGuizmo 没有被操作时，用 UI 控件重建 model
+    if (ImGuizmo::IsUsing() == true) {
+        glm::vec3 scaleX;
+        // ImGuizmo 正在操作时，把 model 拆分同步到 UI 控件
+        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), &translate.x, &rotate.x, &scaleX.x);
+
+        scale = scaleX.x;  // 假设均匀缩放
+    } else {
+        model           = glm::translate(glm::mat4(1.0f), translate);
+        model           = glm::scale(model, glm::vec3(scale, scale, scale));
+        glm::quat quatX = glm::angleAxis(glm::radians(rotate.x), glm::vec3(1, 0, 0));
+        glm::quat quatY = glm::angleAxis(glm::radians(rotate.y), glm::vec3(0, 1, 0));
+        glm::quat quatZ = glm::angleAxis(glm::radians(rotate.z), glm::vec3(0, 0, 1));
+        model *= glm::mat4_cast(quatZ * quatY * quatX);
     }
 }
