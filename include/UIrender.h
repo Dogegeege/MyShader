@@ -40,6 +40,7 @@ class UIRender {
     void MainRender();
     void ViewPortRender();
     void ShowTreeView();  // 导航页面
+    void ShowObectView();
     void ShowMainView();  // 内容页面
     void ShowPageView0();
     void ShowPageView1();

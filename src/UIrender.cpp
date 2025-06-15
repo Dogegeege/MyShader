@@ -103,9 +103,9 @@ void UIRender::MainRender() {
     }
 
     /**添加自己的窗口**/
-
     ViewPortRender();
     ShowTreeView();
+    ShowObectView();
     ShowMainView();
     ShowModelView();
 
@@ -128,7 +128,35 @@ void UIRender::ViewPortRender() {
     ImGui::Image(textureID, viewPortSize, {0, 1}, {1, 0});
 
     ProcessPicking();  // 处理拾取逻辑
+
     ImGui::End();
+}
+
+void UIRender::ShowObectView() {
+    if (selectedObject != nullptr) {
+        HideTabBar();
+        ImGui::Begin("物体");
+        if (ImGui::TreeNodeEx("变换", node_flags_outer)) {
+            ImGui::SeparatorText("位置 ");
+
+            ImGui::Text("平移");
+            ImGui::SameLine();
+            ImGui::DragFloat3("##TRANSLATE", &selectedObject->translate.x, 0.1f, -999.0f, 999.0f, "%.3f");
+
+            ImGui::Text("旋转");
+            ImGui::SameLine();
+            ImGui::DragFloat3("##ROTATE", &selectedObject->rotate.x, 0.1f, -999.0f, 999.0f, "%.3f");
+
+            ImGui::Text("缩放");
+            ImGui::SameLine();
+            ImGui::DragFloat("##SCALE", &selectedObject->scale, 0.01f, 0.001f, 100.0f, "%.3f");
+
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNodeEx("Other", node_flags_inner)) { ImGui::TreePop(); }
+
+        ImGui::End();
+    }
 }
 
 void UIRender::ShowTreeView() {
@@ -153,48 +181,6 @@ void UIRender::ShowTreeView() {
                 ImGui::TreePop();
             }
         }
-        ImGui::TreePop();
-    }
-    if (ImGui::TreeNodeEx("物体", node_flags_outer)) {
-        if (ImGui::TreeNodeEx("变换", node_flags_inner)) {
-            if (selectedObject != nullptr) {
-                ImGui::SeparatorText("位置 ");
-
-                ImGui::Text("平移");
-                ImGui::SameLine();
-                ImGui::DragFloat3("##TRANSLATE", &selectedObject->translate.x, 0.1f, -999.0f, 999.0f, "%.3f");
-
-                // ImGui::Text("X");
-                // ImGui::SameLine();
-                // ImGui::InputFloat("##TRANSLATE_X", &translate.x, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
-                // ImGui::Text("Y");
-                // ImGui::SameLine();
-                // ImGui::InputFloat("##TRANSLATE_Y", &translate.y, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
-                // ImGui::Text("Z");
-                // ImGui::SameLine();
-                // ImGui::InputFloat("##TRANSLATE_Z", &translate.z, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
-
-                ImGui::Text("旋转");
-                ImGui::SameLine();
-                ImGui::DragFloat3("##ROTATE", &selectedObject->rotate.x, 0.1f, -999.0f, 999.0f, "%.3f");
-
-                // ImGui::Text("X");
-                // ImGui::SameLine();
-                // ImGui::InputFloat("##ROTATE_X", &rotate.x, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
-                // ImGui::Text("Y");
-                // ImGui::SameLine();
-                // ImGui::InputFloat("##ROTATE_Y", &rotate.y, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
-                // ImGui::Text("Z");
-                // ImGui::SameLine();
-                // ImGui::InputFloat("##ROTATE_Z", &rotate.z, 0.01f, 1.0f, "%.3f", ImGuiInputTextFlags_CharsDecimal);
-
-                ImGui::Text("缩放");
-                ImGui::SameLine();
-                ImGui::DragFloat("##SCALE", &selectedObject->scale, 0.01f, 0.001f, 100.0f, "%.3f");
-            }
-            ImGui::TreePop();
-        }
-        if (ImGui::TreeNodeEx("Other", node_flags_inner)) { ImGui::TreePop(); }
         ImGui::TreePop();
     }
     ImGui::End();
@@ -317,7 +303,6 @@ void UIRender::Render() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-
     ImGuizmo::BeginFrame();
 
     // 主窗口接收参数标志位
@@ -416,17 +401,14 @@ void UIRender::ProcessPicking() {
     glm::vec3& translate = selectedObject->translate;
     glm::vec3& rotate    = selectedObject->rotate;  // 角度制
     float&     scale     = selectedObject->scale;
-
     ImGuizmo::SetDrawlist();
     ImGuizmo::SetRect(imageScreenPos.x, imageScreenPos.y, viewPortSize.x, viewPortSize.y);
-
     ImGuizmo::Manipulate(glm::value_ptr(*this->view), glm::value_ptr(*this->projection), mCurrentGizmoOperation, mCurrentGizmoMode,
                          glm::value_ptr(model));
 
     // 只在 ImGuizmo 没有被操作时，用 UI 控件重建 model
     if (ImGuizmo::IsUsing() == true) {
         glm::vec3 scaleX;
-        // ImGuizmo 正在操作时，把 model 拆分同步到 UI 控件
         ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), &translate.x, &rotate.x, &scaleX.x);
 
         scale = scaleX.x;  // 假设均匀缩放
