@@ -14,13 +14,8 @@ uniform vec3 iResolution;// viewport resolution (in pixels)
 uniform float iTime;// shader playback time (in seconds)
 uniform vec4 iMouse;// mouse pixel coords. xy: current (if MLB down), zw: click
 uniform vec3 iOrig; 
-uniform vec3 iDir;
-uniform vec3 iEuler;
 
-uniform float iFov;
-uniform vec3 iCamRight;
-uniform vec3 iCamUp;
-uniform vec3 iCamFront;
+
 
 
 
@@ -181,26 +176,41 @@ float heightMapTracing(vec3 ori,vec3 dir,out vec3 p) {
     return mix(tm,tx,hm/(hm-hx));
 }
 
+//屏幕空间射线逆变换
+vec3 getRayDir()
+{
+    //  归一化到NDC空间 [-1,1]
+    vec2 ndc = (gl_FragCoord.xy / iResolution.xy) * 2.0 - 1.0;
 
+    //  构造裁剪空间坐标（z=-1表示近平面，w=1）
+    vec4 clip = vec4(ndc, -1.0, 1.0);
 
+    //  变换到视图空间
+    vec4 viewPos = inverse(iProjection) * clip;
+    viewPos /= viewPos.w;
+
+    //  构造视图空间下的方向（从相机原点指向viewPos）
+    vec3 viewDir = normalize(viewPos.xyz);
+
+    //  变换到世界空间
+    vec3 worldDir = normalize((inverse(iView) * vec4(viewDir, 0.0)).xyz);
+
+    return worldDir;
+}
 vec3 getPixel(vec2 coord,float time) {
-    vec2 uv=coord/iResolution.xy;
-    uv=uv*2.0-1.0;
-    uv.x*=iResolution.x/iResolution.y;//标准化位置
+    // vec2 uv=coord/iResolution.xy;
+    // uv=uv*2.0-1.0;
+    // uv.x*=iResolution.x/iResolution.y;//标准化位置
 
-    
     // ray
     //vec3 ang=vec3(sin(time*3.)*.1,sin(tisme)*.2+.3,time);
     //vec3 ori=vec3(0.,3.5,time*5.);
     //vec3 dir=normalize(vec3(uv.xy,-2.0));  
     //dir.z+=length(uv)*.14;
 
-    vec3 ori=vec3(-iOrig.z ,-iOrig.y,iOrig.x);
-    vec3 ang=iEuler;
-    vec3 dir=normalize(vec3(uv.xy,-2.0));
-    dir.z+=length(uv)*.14;
-    dir=normalize(dir)*fromEuler(ang);
+    vec3 ori=vec3(iOrig.x ,iOrig.y,iOrig.z);
 
+    vec3 dir = getRayDir();
 
 
     // tracing

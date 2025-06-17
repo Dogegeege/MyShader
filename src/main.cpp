@@ -105,17 +105,7 @@ int main() {
         waterShader.setFloat("iTime", glfwGetTime());
         waterShader.setVec3("iResolution", glm::vec3(pFrameBuffer->GetWidth(), pFrameBuffer->GetHeight(), 0.0f));
         waterShader.setVec4("iMouse", glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
-        waterShader.setVec3("iOrig", camera.GetPosition());                                                 // 相反坐标
-        waterShader.setVec3("iEuler", glm::radians(glm::vec3(0.0f, -camera.GetPitch(), camera.GetYaw())));  // 获取摄像机弧度
-        waterShader.setVec3("iDir", camera.GetPosition());
-
-        waterShader.setFloat("iFov", camera.zoom);  // camera.zoom 就是 FOV（单位：度）
-        waterShader.setVec3("iCamRight", camera.GetRight());
-        waterShader.setVec3("iCamUp", camera.GetUp());
-        waterShader.setVec3("iCamFront", camera.GetFront());
-
-        waterShader.setMat4("projection", projection);
-        waterShader.setMat4("view", view);
+        waterShader.setVec3("iOrig", camera.GetPosition());  // 相反坐标
 
         glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
