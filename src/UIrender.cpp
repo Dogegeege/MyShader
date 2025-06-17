@@ -135,7 +135,8 @@ void UIRender::ViewPortRender() {
 void UIRender::ShowObectView() {
     if (selectedObject != nullptr) {
         HideTabBar();
-        ImGui::Begin("物体");
+        std::string node_name = "物体 " + selectedObject->GetName();
+        ImGui::Begin(node_name.c_str());
         if (ImGui::TreeNodeEx("变换", node_flags_outer)) {
             ImGui::SeparatorText("位置 ");
 
@@ -388,7 +389,7 @@ void UIRender::ProcessPicking() {
     static ImGuizmo::MODE      mCurrentGizmoMode      = ImGuizmo::WORLD;
 
     *view       = camera.GetViewMatrix();
-    *projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 100.0f);
+    *projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 500.0f);
 
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGuizmo::IsOver() == false &&
         ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) == true &&

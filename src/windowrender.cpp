@@ -245,7 +245,7 @@ void FrameBuffer::UnBind() {
 
 glm::vec3 FrameBuffer::ReadPixel(const unsigned int x, const unsigned int y) {
     this->Bind();
-    glReadBuffer(GL_COLOR_ATTACHMENT1);
+    glReadBuffer(GL_COLOR_ATTACHMENT1);  // 0为颜色附件，1为拾取ID附件
     glm::uvec3 pixel = {0, 0, 0};
     glReadPixels(x, y, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT, &pixel);
     glReadBuffer(GL_NONE);

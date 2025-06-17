@@ -32,6 +32,12 @@ class Camera {
 
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     inline glm::mat4 GetViewMatrix() { return glm::lookAt(position, position + front, up); }
+    inline glm::vec3 GetPosition() const { return position; }
+    inline glm::vec3 GetFront() const { return front; }
+    inline glm::vec3 GetUp() const { return up; }
+    inline glm::vec3 GetRight() const { return right; }
+    inline float     GetYaw() const { return yaw; }
+    inline float     GetPitch() const { return pitch; }
 
     void ProcessKeyboard(Camera_Movement direction, float deltaTime);
     void ProcessMouseMovement(double xpos, double ypos, bool constrainPitch = true);

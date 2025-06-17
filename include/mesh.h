@@ -51,7 +51,7 @@ class Mesh {
 
     /*  网格数据  */
     std::vector<Vertex>                     vertices;
-    std::vector<GLuint>                     indices;
+    std::vector<unsigned int>               indices;
     std::vector<std::shared_ptr<Texture2D>> textures;
 
    private:

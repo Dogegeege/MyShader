@@ -6,10 +6,10 @@
 
 #include "UIrender.h"
 #include "camera.h"
-#include "grid.h"
 #include "model.h"
 #include "object.h"
 #include "shader.h"
+#include "shape.h"
 #include "skybox.h"
 #include "texture.h"
 #include "windowrender.h"
@@ -29,16 +29,22 @@ int main() {
     Shader pickShader("../../assets/shader/pick.vsh", "../../assets/shader/pick.fsh");
     Shader skyboxShader("../../assets/shader/skybox.vsh", "../../assets/shader/skybox.fsh");
     Shader gridShader("../../assets/shader/grid.vsh", "../../assets/shader/grid.fsh");
+    Shader waterShader("../../assets/shader/water.vsh", "../../assets/shader/water.fsh");
 
     // 全局Uniform块
     //! 需要封装进Shader.h
     unsigned int uniformBlockIndexModel            = glGetUniformBlockIndex(modelShader.ID, "Matrices");
     unsigned int uniformBlockIndexHighLightContour = glGetUniformBlockIndex(highLightContour.ID, "Matrices");
+    unsigned int uniformBlockIndexPick             = glGetUniformBlockIndex(pickShader.ID, "Matrices");
+    // unsigned int uniformBlockIndexSkybox           = glGetUniformBlockIndex(skyboxShader.ID, "Matrices");
+    unsigned int uniformBlockIndexGrid             = glGetUniformBlockIndex(gridShader.ID, "Matrices");
+    unsigned int uniformBlockIndexWater            = glGetUniformBlockIndex(waterShader.ID, "Matrices");
 
     glUniformBlockBinding(modelShader.ID, uniformBlockIndexModel, 0);
     glUniformBlockBinding(highLightContour.ID, uniformBlockIndexHighLightContour, 0);
-    glUniformBlockBinding(pickShader.ID, uniformBlockIndexModel, 0);
-    glUniformBlockBinding(gridShader.ID, uniformBlockIndexHighLightContour, 0);
+    glUniformBlockBinding(pickShader.ID, uniformBlockIndexPick, 0);
+    glUniformBlockBinding(gridShader.ID, uniformBlockIndexGrid, 0);
+    glUniformBlockBinding(waterShader.ID, uniformBlockIndexWater, 0);
 
     unsigned int uboMatrices;
 
@@ -53,13 +59,14 @@ int main() {
     //!--------------------------------------------------------------------
     auto ourModel = std::make_shared<Model>(1, "../../assets/model/vtuber-neuro-sama-v3/textures/Neuro-v3model-Releaseready4.2.obj");
     auto bunny    = std::make_shared<Model>(2, "../../assets/model/bunny/bunny.obj");
+    std::shared_ptr<Object3D>              rectangle = std::make_shared<Rectangle>(3, "Rectangle");
     std::vector<std::shared_ptr<Object3D>> objects;
     objects.push_back(ourModel);
     objects.push_back(bunny);
+    // objects.push_back(rectangle);
     Object3D::loadedObject3D.insert({ourModel->GetID(), ourModel});
     Object3D::loadedObject3D.insert({bunny->GetID(), bunny});
-
-    // std::cout << ourModel.get() << "   " << objects[0].get() << "   " << Object3D::loadedObject3D[ourModel->GetID()].get() << std::endl;
+    Object3D::loadedObject3D.insert({rectangle->GetID(), rectangle});
 
     //  创建立方体贴图
     std::vector<std::string> skyboxFaces = {"../../assets/img/skybox/right.jpg", "../../assets/img/skybox/left.jpg",
@@ -94,6 +101,22 @@ int main() {
         skyboxShader.setMat4("view", unTransView);
         skyboxShader.setMat4("projection", projection);
 
+        waterShader.use();
+        waterShader.setFloat("iTime", glfwGetTime());
+        waterShader.setVec3("iResolution", glm::vec3(pFrameBuffer->GetWidth(), pFrameBuffer->GetHeight(), 0.0f));
+        waterShader.setVec4("iMouse", glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+        waterShader.setVec3("iOrig", camera.GetPosition());                                                 // 相反坐标
+        waterShader.setVec3("iEuler", glm::radians(glm::vec3(0.0f, -camera.GetPitch(), camera.GetYaw())));  // 获取摄像机弧度
+        waterShader.setVec3("iDir", camera.GetPosition());
+
+        waterShader.setFloat("iFov", camera.zoom);  // camera.zoom 就是 FOV（单位：度）
+        waterShader.setVec3("iCamRight", camera.GetRight());
+        waterShader.setVec3("iCamUp", camera.GetUp());
+        waterShader.setVec3("iCamFront", camera.GetFront());
+
+        waterShader.setMat4("projection", projection);
+        waterShader.setMat4("view", view);
+
         glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -114,12 +137,18 @@ int main() {
         glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         for (auto object : objects) {
+            if (object == nullptr) continue;
             pickShader.use();
             pickShader.setMat4("model", object->modelMatrix);
             pickShader.setUnsignedInt("objectID", object->GetID());
 
             object->Draw(pickShader);
         }
+
+        pickShader.use();
+        pickShader.setMat4("model", rectangle->modelMatrix);
+        pickShader.setUnsignedInt("objectID", rectangle->GetID());
+        rectangle->Draw(pickShader);
 
         pFrameBuffer->UnBind();
         //!--------------------------ObjectShade--------------------------------
@@ -132,6 +161,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         for (auto object : objects) {
+            if (object == nullptr) continue;
             modelShader.use();
             modelShader.setMat4("model", object->modelMatrix);
             modelShader.setBool("isZBufferPreview", ui.isZBufferPreview);
@@ -142,6 +172,14 @@ int main() {
             object->SetHighLight(ui.showHightLight && ui.selectedID == object->GetID());
             object->Draw(modelShader, highLightContour);
         }
+
+        waterShader.use();
+        waterShader.setMat4("model", rectangle->modelMatrix);
+        highLightContour.use();
+        highLightContour.setMat4("model", rectangle->modelMatrix);
+
+        rectangle->SetHighLight(ui.showHightLight && ui.selectedID == rectangle->GetID());
+        rectangle->Draw(waterShader, highLightContour);
 
         pFrameBuffer->UnBind();
         //!-------------------------------SkyBox-----------------------------------------
