@@ -15,10 +15,6 @@ uniform float iTime;// shader playback time (in seconds)
 uniform vec4 iMouse;// mouse pixel coords. xy: current (if MLB down), zw: click
 uniform vec3 iOrig; 
 
-
-
-
-
 out vec4 FragColor;
 
 const int NUM_STEPS=32;
@@ -177,8 +173,7 @@ float heightMapTracing(vec3 ori,vec3 dir,out vec3 p) {
 }
 
 //屏幕空间射线逆变换
-vec3 getRayDir()
-{
+vec3 getRayDir() {
     //  归一化到NDC空间 [-1,1]
     vec2 ndc = (gl_FragCoord.xy / iResolution.xy) * 2.0 - 1.0;
 
@@ -208,10 +203,9 @@ vec3 getPixel(vec2 coord,float time) {
     //vec3 dir=normalize(vec3(uv.xy,-2.0));  
     //dir.z+=length(uv)*.14;
 
-    vec3 ori=vec3(iOrig.x ,iOrig.y,iOrig.z);
+    vec3 ori=iOrig;
 
     vec3 dir = getRayDir();
-
 
     // tracing
     vec3 p;
