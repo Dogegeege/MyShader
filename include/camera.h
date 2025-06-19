@@ -32,6 +32,7 @@ class Camera {
 
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     inline glm::mat4 GetViewMatrix() { return glm::lookAt(position, position + front, up); }
+    inline glm::mat4 GetProjectionMatrix() { return glm::perspective(glm::radians(zoom), aspectRatio, 0.1f, 100.0f); }
     inline glm::vec3 GetPosition() const { return position; }
     inline glm::vec3 GetFront() const { return front; }
     inline glm::vec3 GetUp() const { return up; }

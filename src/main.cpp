@@ -105,7 +105,7 @@ int main() {
         waterShader.setFloat("iTime", glfwGetTime());
         waterShader.setVec3("iResolution", glm::vec3(pFrameBuffer->GetWidth(), pFrameBuffer->GetHeight(), 0.0f));
         waterShader.setVec4("iMouse", glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
-        waterShader.setVec3("iOrig", camera.GetPosition());  // 相反坐标
+        waterShader.setVec3("iOrig", camera.GetPosition());
 
         glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
@@ -175,9 +175,8 @@ int main() {
         //!-------------------------------SkyBox-----------------------------------------
         pFrameBuffer->Bind();
 
-        if (ui.isSkyboxPreview == true) {
-            // draw skybox as last
-            glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+        if (ui.isSkyboxPreview == true) {  // draw skybox as last
+            glDepthFunc(GL_LEQUAL);        // change depth function so depth test passes when values are equal to depth buffer's content
             skybox->Draw(skyboxShader);
             glDepthFunc(GL_LESS);  // set depth function back to default
         }

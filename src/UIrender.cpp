@@ -389,7 +389,7 @@ void UIRender::ProcessPicking() {
     static ImGuizmo::MODE      mCurrentGizmoMode      = ImGuizmo::WORLD;
 
     *view       = camera.GetViewMatrix();
-    *projection = glm::perspective(glm::radians(camera.zoom), camera.aspectRatio, 0.1f, 500.0f);
+    *projection = camera.GetProjectionMatrix();
 
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGuizmo::IsOver() == false &&
         ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) == true &&
