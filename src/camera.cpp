@@ -7,6 +7,7 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& up)
       zoom(ZOOM),
       yaw(YAW),
       pitch(PITCH),
+      farPlame(FAR_PLANE),
       position(position),
       worldUp(up),
       aspectRatio(static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT)) {

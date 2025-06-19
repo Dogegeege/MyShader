@@ -20,6 +20,7 @@ constexpr float ZOOM        = 45.0f;
 constexpr int SCR_WIDTH  = 1280;
 constexpr int SCR_HEIGHT = 720;
 
+constexpr float FAR_PLANE = 1000.0f;
 }  // namespace
 
 /**
@@ -31,14 +32,16 @@ class Camera {
     Camera(float posX, float posY, float posZ, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f);
 
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
-    inline glm::mat4 GetViewMatrix() { return glm::lookAt(position, position + front, up); }
-    inline glm::mat4 GetProjectionMatrix() { return glm::perspective(glm::radians(zoom), aspectRatio, 0.1f, 100.0f); }
+    inline glm::mat4 GetViewMatrix() const { return glm::lookAt(position, position + front, up); }
+    inline glm::mat4 GetProjectionMatrix() const { return glm::perspective(glm::radians(zoom), aspectRatio, 0.1f, farPlame); }
     inline glm::vec3 GetPosition() const { return position; }
     inline glm::vec3 GetFront() const { return front; }
     inline glm::vec3 GetUp() const { return up; }
     inline glm::vec3 GetRight() const { return right; }
     inline float     GetYaw() const { return yaw; }
     inline float     GetPitch() const { return pitch; }
+
+    inline void SetFarPlane(float farPlane) { farPlame = farPlane; }
 
     void ProcessKeyboard(Camera_Movement direction, float deltaTime);
     void ProcessMouseMovement(double xpos, double ypos, bool constrainPitch = true);
@@ -65,5 +68,7 @@ class Camera {
     // 欧拉角
     float yaw;
     float pitch;
+
+    float farPlame;
 };
 #endif
