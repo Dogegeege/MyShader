@@ -7,8 +7,10 @@
  */
 precision mediump float;
 
-in mat4 iProjection;
-in mat4 iView;
+layout(std140) uniform Matrices {
+    mat4 projection;
+    mat4 view;
+};
 
 uniform vec3 iResolution;// viewport resolution (in pixels)
 uniform float iTime;// shader playback time (in seconds)
@@ -181,14 +183,14 @@ vec3 getRayDir() {
     vec4 clip = vec4(ndc, -1.0, 1.0);
 
     //  变换到视图空间
-    vec4 viewPos = inverse(iProjection) * clip;
+    vec4 viewPos = inverse(projection) * clip;
     viewPos /= viewPos.w;
 
     //  构造视图空间下的方向（从相机原点指向viewPos）
     vec3 viewDir = normalize(viewPos.xyz);
 
     //  变换到世界空间
-    vec3 worldDir = normalize((inverse(iView) * vec4(viewDir, 0.0)).xyz);
+    vec3 worldDir = normalize((inverse(view) * vec4(viewDir, 0.0)).xyz);
 
     return worldDir;
 }
