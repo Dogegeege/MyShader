@@ -154,7 +154,13 @@ void UIRender::ShowObectView() {
 
             ImGui::TreePop();
         }
-        if (ImGui::TreeNodeEx("Other", node_flags_inner)) { ImGui::TreePop(); }
+        if (ImGui::TreeNodeEx("Other", node_flags_inner)) {
+            ImGui::Checkbox("Z-buffer预览", &isZBufferPreview);
+            ImGui::Checkbox("天空盒预览", &isSkyboxPreview);
+            ImGui::Checkbox("高亮边框", &showHightLight);
+
+            ImGui::TreePop();
+        }
 
         ImGui::End();
     }
@@ -266,32 +272,18 @@ void UIRender::ShowPageView1() {
 void UIRender::ShowModelView() {
     // HideTabBar();
     ImGui::Begin("场景集合");
+
     if (ImGui::TreeNodeEx("模型", node_flags_outer)) {
-        //! 此处技术未学到 关键词 FBO 存储多个模型实例，每个模型分配唯一整数 ID，每个模型存储独立变换矩阵...
-        //! 以及点击选中的效果
-        // for (auto [i, j] : Object3D::loadedObject3D) {
-        //     if (ImGui::TreeNodeEx(i.c_str(), node_flags_selected)) {
-        //         if (ImGui::IsItemClicked()) {
-        //             // if (isSelected == false) {
-        //             //     SelectedModel.insert({i, j});
-        //             //     isSelected = true;
-        //             // } else {
-        //             //     SelectedModel.erase(i);
-        //             //     isSelected = false;
-        //             // }
+        for (auto [i, j] : Object3D::loadedObject3D) {
+            ImGuiTreeNodeFlags node_flags = node_flags_selected;
+            if (i == selectedID) node_flags |= ImGuiTreeNodeFlags_Selected;
+            bool node_open = ImGui::TreeNodeEx(j->GetName().c_str(), node_flags);
 
-        //             std::cout << "selected" << std::endl;
-        //         }
-
-        //         ImGui::TreePop();
-        //     }
-        // }
+            if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) { selectedID = i; }
+            if (node_open == true) { ImGui::TreePop(); }
+        }
         ImGui::TreePop();
     }
-
-    ImGui::Checkbox("Z-buffer预览", &isZBufferPreview);
-    ImGui::Checkbox("天空盒预览", &isSkyboxPreview);
-    ImGui::Checkbox("高亮边框", &showHightLight);
 
     ImGui::End();
 }
@@ -315,12 +307,12 @@ void UIRender::Render() {
     dockspace_flags |= ImGuiDockNodeFlags_PassthruCentralNode;
     // dockspace_flags |= ImGuiDockNodeFlags_AutoHideTabBar;
 
-    node_flags_inner    = static_cast<ImGuiTreeNodeFlags_>(ImGuiTreeNodeFlags_DrawLinesFull);
-    node_flags_outer    = static_cast<ImGuiTreeNodeFlags_>(ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DrawLinesFull);
-    node_flags_selected = static_cast<ImGuiTreeNodeFlags_>(ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_DrawLinesFull);
+    node_flags_inner    = static_cast<ImGuiTreeNodeFlags>(ImGuiTreeNodeFlags_DrawLinesFull);
+    node_flags_outer    = static_cast<ImGuiTreeNodeFlags>(ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DrawLinesFull);
+    node_flags_selected = static_cast<ImGuiTreeNodeFlags>(ImGuiTreeNodeFlags_SpanAvailWidth);
     this->MainRender();
     //   ImGui::ShowAboutWindow();
-    //   ImGui::ShowDebugLogWindow();
+    ImGui::ShowDebugLogWindow();
     ImGui::ShowDemoWindow();
 
     ImGui::Render();
@@ -353,7 +345,7 @@ void UIRender::UIInit() {
     io->ConfigViewportsNoAutoMerge   = true;                //?禁用窗口合并
     io->ConfigViewportsNoTaskBarIcon = false;               // 启用后，所有子视口窗口将不显示独立的任务栏图标
     // 中文的设置，记得将main.cpp的文件编码类型改为UTF-8
-    ImFont* font = io->Fonts->AddFontFromFileTTF("C:\\\\Windows\\\\Fonts\\\\msyh.ttc", 30.f, nullptr, io->Fonts->GetGlyphRangesChineseFull());
+    ImFont* font = io->Fonts->AddFontFromFileTTF("C:\\\\Windows\\\\Fonts\\\\STZHONGS.TTF", 30.f, nullptr, io->Fonts->GetGlyphRangesChineseFull());
 
     // 判断字体加载成功
     IM_ASSERT(font != nullptr);
@@ -394,9 +386,10 @@ void UIRender::ProcessPicking() {
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGuizmo::IsOver() == false &&
         ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) == true &&
         ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows) == true) {
-        selectedID     = clickedID;
-        selectedObject = Object3D::GetObject3D(selectedID);
+        selectedID = clickedID;
     }
+    selectedObject = Object3D::GetObject3D(selectedID);
+
     if (selectedObject == nullptr || selectedID == 0) { return; }
     glm::mat4& model     = selectedObject->modelMatrix;
     glm::vec3& translate = selectedObject->translate;

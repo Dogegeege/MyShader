@@ -69,14 +69,14 @@ class UIRender {
     int FirstIdx  = 0;  // 一级索引
     int SecondIdx = 0;  // 二级索引
 
-    bool                p_open              = true;                     // *使用窗口关闭功能
-    bool                opt_fullscreen      = true;                     // 控制窗口是否全屏
-    bool                opt_padding         = false;                    // 控制窗口内边距是否启用(与边框保持一定空白区域)
-    ImGuiDockNodeFlags  dockspace_flags     = ImGuiDockNodeFlags_None;  // 停靠窗口接收参数标志位
-    ImGuiWindowFlags    window_flags        = ImGuiWindowFlags_None;    // 主窗口接收参数标志位
-    ImGuiTreeNodeFlags_ node_flags_inner    = ImGuiTreeNodeFlags_None;
-    ImGuiTreeNodeFlags_ node_flags_outer    = ImGuiTreeNodeFlags_None;
-    ImGuiTreeNodeFlags_ node_flags_selected = ImGuiTreeNodeFlags_None;
+    bool               p_open              = true;                     // *使用窗口关闭功能
+    bool               opt_fullscreen      = true;                     // 控制窗口是否全屏
+    bool               opt_padding         = false;                    // 控制窗口内边距是否启用(与边框保持一定空白区域)
+    ImGuiDockNodeFlags dockspace_flags     = ImGuiDockNodeFlags_None;  // 停靠窗口接收参数标志位
+    ImGuiWindowFlags   window_flags        = ImGuiWindowFlags_None;    // 主窗口接收参数标志位
+    ImGuiTreeNodeFlags node_flags_inner    = ImGuiTreeNodeFlags_None;
+    ImGuiTreeNodeFlags node_flags_outer    = ImGuiTreeNodeFlags_None;
+    ImGuiTreeNodeFlags node_flags_selected = ImGuiTreeNodeFlags_None;
 
    private:
     void UIInit();
