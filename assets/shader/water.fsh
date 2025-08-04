@@ -89,23 +89,30 @@ float sea_octave(vec2 uv,float choppy) {
 }
 
 float map(vec3 p) {
-    float freq=SEA_FREQ;
-    float amp=SEA_HEIGHT;
-    float choppy=SEA_CHOPPY;
-    vec2 uv=p.xz;uv.x*=.75;
+    float freq=SEA_FREQ;//波浪的频率
+    float amp=SEA_HEIGHT;//波浪高度
+    float choppy=SEA_CHOPPY;//尖锐程度
+    vec2 uv=p.xz;uv.x*=.75;//点p的投影
 
     float d,h=0.;
     for(int i=0;i<ITER_GEOMETRY;i++) {
-        d=sea_octave((uv+SEA_TIME)*freq,choppy);
-        d+=sea_octave((uv-SEA_TIME)*freq,choppy);
+        //海面波浪多层八度叠加
+        d=sea_octave((uv+SEA_TIME)*freq,choppy);//模拟正向波浪
+        d+=sea_octave((uv-SEA_TIME)*freq,choppy);//模拟反向波浪
         h+=d*amp;
-        uv*=octave_m;freq*=1.9;amp*=.22;
-        choppy=mix(choppy,1.,.2);
+        uv*=octave_m;freq*=1.9;amp*=.22;//小波更高频
+        choppy=mix(choppy,1.,.2);//谜之参数(或许是限制锐化程度) 0.8*choppy+0.2*1
     }
+    /**
+    return p.y-h;：返回该点的实际高度（y）减去波浪高度（h），
+    如果结果 > 0，说明点在水面之上；
+    如果 < 0，说明点在水面之下。
+     */
     return p.y-h;
 }
 
 float map_detailed(vec3 p) {
+    //细节版本,用于法线计算
     float freq=SEA_FREQ;
     float amp=SEA_HEIGHT;
     float choppy=SEA_CHOPPY;
@@ -141,23 +148,31 @@ vec3 getSeaColor(vec3 p,vec3 n,vec3 l,vec3 eye,vec3 dist) {
 
 // tracing
 vec3 getNormal(vec3 p,float eps) {
+    //F(x,y,z)=0,法线(Fx,Fy,Fz)
+    //f(x, z) = y - h(x, z)
+    //∇f = (∂f/∂x, ∂f/∂y, ∂f/∂z) = (-∂h/∂x, 1, -∂h/∂z)
     vec3 n;
     n.y=map_detailed(p);
     n.x=map_detailed(vec3(p.x+eps,p.y,p.z))-n.y;
     n.z=map_detailed(vec3(p.x,p.y,p.z+eps))-n.y;
     n.y=eps;
-    return normalize(n);
+    return normalize(n);//高度场的梯度,
 }
 
+/*
+* p 返回光线与水面交点
+ */
 float heightMapTracing(vec3 ori,vec3 dir,out vec3 p) {
-    float tm=0.;
-    float tx=1000.;
-    float hx=map(ori+dir*tx);
+    float tm=0.;//射线起点（相机位置）
+    float tx=1000.;//射线最远端(无穷远处)
+    float hx=map(ori+dir*tx);//计算射线远端点在高度场上的值
     if(hx>0.) {
+        //无穷远端都在水面上,说明此射线未与水面相交
         p=ori+dir*tx;
         return tx;
     }
-    float hm=map(ori);
+    //细节二分
+    float hm=map(ori);//最近端
     for(int i=0;i<NUM_STEPS;i++) {
         float tmid=mix(tm,tx,hm/(hm-hx));
         p=ori+dir*tmid;
@@ -210,7 +225,7 @@ vec3 getPixel(vec2 coord,float time) {
     vec3 dir = getRayDir();
 
     // tracing
-    vec3 p;
+    vec3 p;//光线与水面相交的位置
     heightMapTracing(ori,dir,p);
     vec3 dist=p-ori;
     vec3 n=getNormal(p,dot(dist,dist)*EPSILON_NRM);

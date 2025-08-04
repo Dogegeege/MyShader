@@ -33,42 +33,20 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     auto camera = WindowRender::windowCameraMap[window];
-
-    InputInfo::GetInstance()->mouse_pos_x = static_cast<float>(xpos);
-    InputInfo::GetInstance()->mouse_pos_y = static_cast<float>(ypos);
-    Input::ProcessMouseMovement(window, *camera);
+    Input::ProcessInputMouseMovement(window, camera, xpos, ypos);
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-    auto camera = WindowRender::windowCameraMap[window];
-
-    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-        InputInfo::GetInstance()->mouse_button_right = true;
-    } else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
-        InputInfo::GetInstance()->mouse_button_right   = false;
-        InputInfo::GetInstance()->mouse_first_movement = true;  // 鼠标第一次移动
-    }
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        InputInfo::GetInstance()->mouse_button_left = true;
-    } else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-        InputInfo::GetInstance()->mouse_button_left = false;
-    }
-    if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
-        InputInfo::GetInstance()->mouse_button_middle = true;
-    } else if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_RELEASE) {
-        InputInfo::GetInstance()->mouse_button_middle = false;
-    }
+    Input::ProcessInputMouseButton(window, button, action, mods);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     auto camera = WindowRender::windowCameraMap[window];
-
-    InputInfo::GetInstance()->mouse_wheel_y = static_cast<float>(yoffset);
-    Input::ProcessInputMouseWheel(window, *camera);
+    Input::ProcessInputMouseWheel(window, camera, yoffset);
 }
 
-WindowRender::WindowRender(Camera& camera, const std::string& name)
-    : windowName(name), camera(&camera), screenHeight(SCR_HEIGHT), screenWidth(SCR_WIDTH) {
+WindowRender::WindowRender(Camera& camera, const std::string& name, int wihdth, int height)
+    : windowName(name), camera(&camera), screenWidth(wihdth), screenHeight(height) {
     window = InitWindow();
     windowCameraMap.insert({window, &camera});
 }
@@ -131,6 +109,12 @@ GLFWwindow* WindowRender::InitWindow() {
 #endif
 
     return window;
+}
+
+void WindowRender::TerminateWindow() {
+    windowCameraMap.erase(window);
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
 //-----------------------------------------------------------------------------------

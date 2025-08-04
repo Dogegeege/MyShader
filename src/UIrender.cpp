@@ -102,6 +102,9 @@ void UIRender::MainRender() {
         ImGui::EndMenuBar();
     }
 
+    // Begin()后,实时更新的变量
+    InputInfo::GetInstance()->UnFocusOnRenderWindow();
+
     /**添加自己的窗口**/
     ViewPortRender();
     ShowTreeView();
@@ -124,6 +127,8 @@ void UIRender::ViewPortRender() {
 
     InitViewPort();
 
+    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) == true) { InputInfo::GetInstance()->FocusOnRenderWindow(); }
+
     unsigned int textureID = pFrameBuffer->GetColorAttachment();  // 获取颜色纹理的ID
     ImGui::Image(textureID, viewPortSize, {0, 1}, {1, 0});
 
@@ -133,37 +138,36 @@ void UIRender::ViewPortRender() {
 }
 
 void UIRender::ShowObectView() {
-    if (selectedObject != nullptr) {
-        HideTabBar();
-        std::string node_name = "物体 " + selectedObject->GetName();
-        ImGui::Begin(node_name.c_str());
-        if (ImGui::TreeNodeEx("变换", node_flags_outer)) {
-            ImGui::SeparatorText("位置 ");
+    if (selectedObject == nullptr) { return; }
+    HideTabBar();
+    std::string node_name = "物体 " + selectedObject->GetName();
+    ImGui::Begin(node_name.c_str(), nullptr, ImGuiWindowFlags_NoFocusOnAppearing);
+    if (ImGui::TreeNodeEx("变换", node_flags_outer)) {
+        ImGui::SeparatorText("位置 ");
 
-            ImGui::Text("平移");
-            ImGui::SameLine();
-            ImGui::DragFloat3("##TRANSLATE", &selectedObject->translate.x, 0.1f, -999.0f, 999.0f, "%.3f");
+        ImGui::Text("平移");
+        ImGui::SameLine();
+        ImGui::DragFloat3("##TRANSLATE", &selectedObject->translate.x, 0.1f, -999.0f, 999.0f, "%.3f");
 
-            ImGui::Text("旋转");
-            ImGui::SameLine();
-            ImGui::DragFloat3("##ROTATE", &selectedObject->rotate.x, 0.1f, -999.0f, 999.0f, "%.3f");
+        ImGui::Text("旋转");
+        ImGui::SameLine();
+        ImGui::DragFloat3("##ROTATE", &selectedObject->rotate.x, 0.1f, -999.0f, 999.0f, "%.3f");
 
-            ImGui::Text("缩放");
-            ImGui::SameLine();
-            ImGui::DragFloat("##SCALE", &selectedObject->scale, 0.01f, 0.001f, 100.0f, "%.3f");
+        ImGui::Text("缩放");
+        ImGui::SameLine();
+        ImGui::DragFloat("##SCALE", &selectedObject->scale, 0.01f, 0.001f, 100.0f, "%.3f");
 
-            ImGui::TreePop();
-        }
-        if (ImGui::TreeNodeEx("Other", node_flags_inner)) {
-            ImGui::Checkbox("Z-buffer预览", &isZBufferPreview);
-            ImGui::Checkbox("天空盒预览", &isSkyboxPreview);
-            ImGui::Checkbox("高亮边框", &showHightLight);
-
-            ImGui::TreePop();
-        }
-
-        ImGui::End();
+        ImGui::TreePop();
     }
+    if (ImGui::TreeNodeEx("Other", node_flags_inner)) {
+        ImGui::Checkbox("Z-buffer预览", &isZBufferPreview);
+        ImGui::Checkbox("天空盒预览", &isSkyboxPreview);
+        ImGui::Checkbox("高亮边框", &showHightLight);
+
+        ImGui::TreePop();
+    }
+
+    ImGui::End();
 }
 
 void UIRender::ShowTreeView() {

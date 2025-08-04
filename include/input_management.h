@@ -1,6 +1,10 @@
 #ifndef INPUT_MANAGEMENT_H
 #define INPUT_MANAGEMENT_H
 
+#include <glad/glad.h>
+
+#include <GLFW/glfw3.h>
+
 #include "camera.h"
 #include "singleton_util.h"
 
@@ -14,7 +18,7 @@ class InputInfo : public Singleton<InputInfo> {
         mouse_lastpos_x      = SCR_WIDTH / 2.0;
         mouse_lastpos_y      = SCR_HEIGHT / 2.0;
     }
-    void Update() {
+    inline void Update() {
         if (mouse_first_movement == true) {
             mouse_lastpos_x      = mouse_pos_x;
             mouse_lastpos_y      = mouse_pos_y;
@@ -26,11 +30,15 @@ class InputInfo : public Singleton<InputInfo> {
         mouse_lastpos_x = mouse_pos_x;
         mouse_lastpos_y = mouse_pos_y;
     }
-    void TimeUpdate(const float& currentTime = 0.0f) {
+    inline void TimeUpdate(const float& currentTime = 0.0f) {
         float currentFrame = currentTime;
         deltaTime          = currentFrame - lastFrame;
         lastFrame          = currentFrame;
     }
+    inline bool IsFocusOnRenderWindow() { return isFocusOnRenderWindow; }
+    inline void FocusOnRenderWindow() { isFocusOnRenderWindow = true; }
+    inline void UnFocusOnRenderWindow() { isFocusOnRenderWindow = false; }
+
     float mouse_pos_x;
     float mouse_pos_y;
 
@@ -56,29 +64,14 @@ class InputInfo : public Singleton<InputInfo> {
     float             mouse_lastpos_y;
 
     float lastFrame = 0.0f;
+
+    bool isFocusOnRenderWindow = false;
 };
+
 namespace Input {
-static void ProcessInputKeyBorard(GLFWwindow* window, Camera& camera, float deltaTime) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true);  // 按ESC退出
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) camera.ProcessKeyboard(UP, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) camera.ProcessKeyboard(DOWN, deltaTime);
-}
-
-static void ProcessInputMouseWheel(GLFWwindow* window, Camera& camera) {
-    if (InputInfo::GetInstance()->mouse_button_middle == true) camera.ProcessMouseScroll(InputInfo::GetInstance()->mouse_wheel_y);
-}
-
-static void ProcessMouseMovement(GLFWwindow* window, Camera& camera) {
-    if (InputInfo::GetInstance()->mouse_button_right == true) {
-        InputInfo::GetInstance()->Update();  // 更新鼠标状态
-        camera.ProcessMouseMovement(InputInfo::GetInstance()->mouse_offset_x * InputInfo::GetInstance()->mouse_sensitivity,
-                                    InputInfo::GetInstance()->mouse_offset_y * InputInfo::GetInstance()->mouse_sensitivity);
-    }
-}
+void ProcessInputKeyBorard(GLFWwindow* window, Camera* camera, float deltaTime);
+void ProcessInputMouseWheel(GLFWwindow* window, Camera* camer, float yoffset);
+void ProcessInputMouseMovement(GLFWwindow* window, Camera* camera, double xpos, double ypos);
+void ProcessInputMouseButton(GLFWwindow* window, int button, int action, int mods);
 }  // namespace Input
-
 #endif  // INPUT_MANAGEMENT_H

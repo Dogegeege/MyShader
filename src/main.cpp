@@ -17,7 +17,7 @@
 int main() {
     //!--------------------------加载资源----------------------------------
     Camera       camera(glm::vec3(0.0f, 0.0f, 3.0f));
-    WindowRender windowRender(camera, "LearnOpenGL");
+    WindowRender windowRender(camera, "LearnOpenGL", SCR_WIDTH, SCR_HEIGHT);
     FrameBuffer* pFrameBuffer = new FrameBuffer(640, 480);
     UIRender     ui(windowRender, camera, pFrameBuffer);
     Grid         grid;
@@ -91,8 +91,8 @@ int main() {
         glm::mat4& view       = *ui.view;
         glm::mat4& projection = *ui.projection;
 
-        InputInfo::GetInstance()->TimeUpdate(static_cast<float>(glfwGetTime()));                              // 更新输入时间
-        Input::ProcessInputKeyBorard(windowRender.getWindow(), camera, InputInfo::GetInstance()->deltaTime);  // IO响应
+        InputInfo::GetInstance()->TimeUpdate(static_cast<float>(glfwGetTime()));                               // 更新输入时间
+        Input::ProcessInputKeyBorard(windowRender.getWindow(), &camera, InputInfo::GetInstance()->deltaTime);  // IO响应
 
         //!--------------------------Shader--------------------------------
 

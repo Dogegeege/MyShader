@@ -11,8 +11,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include <GLFW/glfw3.h>
-
+#include "input_management.h"
 #include "model.h"
 #include "windowrender.h"
 

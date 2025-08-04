@@ -26,12 +26,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 class WindowRender {
    public:
-    WindowRender(Camera& camera, const std::string& name);
-    virtual ~WindowRender() {
-        windowCameraMap.erase(window);
-        glfwDestroyWindow(window);
-        glfwTerminate();
-    };
+    WindowRender(Camera& camera, const std::string& name, int width, int heigh);
+    ~WindowRender() { TerminateWindow(); }
 
     inline GLFWwindow* getWindow() const { return window; }
     void               GetScreenSize(int& width, int& height);
@@ -48,6 +44,7 @@ class WindowRender {
     Camera*     camera;
 
     GLFWwindow* InitWindow();
+    void        TerminateWindow();
 };
 
 /**
