@@ -34,7 +34,7 @@ endif ()
 
 if (NOT TARGET imgui)
     include(imgui.cmake)
-    set_target_properties(imgui PROPERTIES FOLDER ${INCLUDE_FOLDER}/imgui)
+    set_target_properties(imgui PROPERTIES FOLDER ${INCLUDE_FOLDER}/imgui-docking)
 endif ()
 
 ##############################################################################
