@@ -11,18 +11,19 @@
 template <class T>
 class Singleton {
    public:
-    Singleton(Singleton&&)           = delete;
-    Singleton(const Singleton&)      = delete;
-    void operator=(const Singleton&) = delete;
-    T*   operator&()                 = delete;
-
     static T* GetInstance() {
-        static T* instance;
-        if (instance == nullptr) { instance = new T(); }
-        return instance;
+        static T instance;
+        return &instance;
     }
 
    protected:
     Singleton()          = default;
     virtual ~Singleton() = default;
+
+   private:
+    Singleton(Singleton&&)                 = delete;
+    Singleton(const Singleton&)            = delete;
+    Singleton& operator=(Singleton&&)      = delete;
+    Singleton& operator=(const Singleton&) = delete;
+    // T*         operator&()                 = delete;
 };

@@ -47,41 +47,50 @@ add_subdirectory(3rdParty)
 
 #头文件
 file(GLOB PROJECT_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/global/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/util/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/math/*.h
+
     #include/Application
 )
 
 # 第三方库头文件
 file(GLOB THIRD_PARTY_HEADERS
-    3rdParty/glad/include
-    3rdParty/glfw/include
-    3rdParty/glm-1.0.1
-    3rdParty/imgui-docking
-    3rdParty/stb_image
-    3rdParty/assimp/include
-    3rdParty/imguizmo
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glad/include/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glfw/include/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glm-1.0.1/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui-docking/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/stb_image/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/assimp/include/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imguizmo/*.h
 
-    ${CMAKE_BINARY_DIR}/3rdParty/assimp/include/assimp
+    ${CMAKE_BINARY_DIR}/3rdParty/assimp/include/assimp/*.h
     
 )
 
 
 #可执行文件
 file(GLOB PROJECT_SOURCES
-    src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/util/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/math/*.cpp
+
 )
 
 #着色器文件
 file(GLOB PROJECT_SHADERS
-    assets/shader/*.vert
-    assets/shader/*.vs
-    assets/shader/*.vsh
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/shader/*.vert
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/shader/*.vs
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/shader/*.vsh
 
-    assets/shader/*.frag
-    assets/shader/*.fs
-    assets/shader/*.fsh
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/shader/*.frag
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/shader/*.fs
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/shader/*.fsh
 
-    assets/shader/*.geom
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/shader/*.geom
     #assets/shader/*.geom
     #....
 )
@@ -95,21 +104,27 @@ add_executable(${TARGET_NAME} ${PROJECT_SOURCES})
 # 添加头文件搜索路径
 # 设置为 PUBLIC 是为了浏览子模块时候头文件不报错
 target_include_directories(${TARGET_NAME} PUBLIC
-    #${THIRD_PARTY_HEADERS}
-    3rdParty/glad/include
-    3rdParty/glfw/include
-    3rdParty/glm-1.0.1
-    3rdParty/imgui-docking
-    3rdParty/stb_image
-    3rdParty/assimp/include
-    3rdParty/imguizmo
+   #${THIRD_PARTY_HEADERS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glad/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glfw/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glm-1.0.1
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui-docking
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/stb_image
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/assimp/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imguizmo
 
 
     ${CMAKE_BINARY_DIR}/3rdParty/assimp/include/assimp
     
     #${PROJECT_HEADERS}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/global
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/util
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/math
 
+
+    
 )
 
 # 添加文件分组

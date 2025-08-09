@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "UIrender.h"
+#include "attribute.h"
 #include "camera.h"
 #include "model.h"
 #include "object.h"
