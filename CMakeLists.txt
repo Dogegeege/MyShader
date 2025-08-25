@@ -52,6 +52,10 @@ file(GLOB PROJECT_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/global/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/util/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/math/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/material/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/*.h    
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/cameracontrol/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/texture/*.h
 
     #include/Application
 )
@@ -77,6 +81,12 @@ file(GLOB PROJECT_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/util/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/math/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/material/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/cameracontrol/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/texture/*.cpp
+
+
 
 )
 
@@ -122,7 +132,10 @@ target_include_directories(${TARGET_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/global
     ${CMAKE_CURRENT_SOURCE_DIR}/src/util
     ${CMAKE_CURRENT_SOURCE_DIR}/src/math
-
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/camera
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/cameracontrol
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/texture
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/material
 
     
 )

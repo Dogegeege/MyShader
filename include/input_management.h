@@ -5,7 +5,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include "camera.h"
+#include "_camera.h"
 #include "singleton_util.h"
 
 class InputInfo : public Singleton<InputInfo> {

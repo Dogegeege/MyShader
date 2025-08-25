@@ -105,7 +105,7 @@ void Object3D::setRotateAroundAxis(const glm::vec3& axis, float angle) noexcept 
     decompose();
 }
 
-auto Object3D::lookAt(const glm::vec3& target, const glm::vec3& up) noexcept -> void {
+void Object3D::lookAt(const glm::vec3& target, const glm::vec3& up) noexcept {
     /// decompose scale
     float scaleX = glm::length(glm::vec3(mLocalMatrix[0]));
     float scaleY = glm::length(glm::vec3(mLocalMatrix[1]));
@@ -148,7 +148,7 @@ void Object3D::updateMatrix() noexcept {
 }
 
 glm::mat4 Object3D::updateWorldMatrix(bool updateParent, bool updateChildren) noexcept {
-    /// 检查有没有父节点
+    // 检查有没有父节点
     if (mParent.expired() == false && updateParent == true) {  // 递归更新父节点
         const auto parent = mParent.lock();
         parent->updateWorldMatrix(true, false);
@@ -158,7 +158,7 @@ glm::mat4 Object3D::updateWorldMatrix(bool updateParent, bool updateChildren) no
 
     mWorldMatrix = mLocalMatrix;
 
-    /// 如果有父节点,需要左乘父节点变换矩阵
+    // 如果有父节点,需要左乘父节点变换矩阵
     if (mParent.expired() == false) {
         auto parent  = mParent.lock();
         mWorldMatrix = parent->mWorldMatrix * mWorldMatrix;

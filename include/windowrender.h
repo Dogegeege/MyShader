@@ -10,7 +10,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include "camera.h"
+#include "_camera.h"
 #include "input_management.h"
 #include "object.h"
 

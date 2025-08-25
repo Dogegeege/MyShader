@@ -19,7 +19,9 @@ class ObjectTypeChecker {
     bool mIsDirectionalLight{false};
 };
 
-/// Object3D是所有空间变换、节点结构等的最基础的类型
+/**
+ * @brief Object3D是所有空间变换、节点结构等的最基础的类型
+ */
 class Object3D : public std::enable_shared_from_this<Object3D>, public ObjectTypeChecker {
    public:
     /// 使用智能指针进行管理
@@ -69,11 +71,11 @@ class Object3D : public std::enable_shared_from_this<Object3D>, public ObjectTyp
     void setRotateAroundAxis(const glm::vec3& axis, float angle) noexcept;
 
     /**
-     * @brief 设置Object3D看向target的`view`变换
+     * @brief 设置Object3D看向 `target` 的方向，更新自己模型坐标系的旋转部分
      * @param target 看向的位置
      * @param up 世界坐标系的up
      */
-    void lookAt(const glm::vec3& target, const glm::vec3& up) noexcept;
+    void lookAt(const glm::vec3& target, const glm::vec3& up = worldUP) noexcept;
 
     /**
      *  @brief 设置模型坐标系（相对于父节点的局部坐标系）
@@ -97,7 +99,10 @@ class Object3D : public std::enable_shared_from_this<Object3D>, public ObjectTyp
     /// @brief 更新Object3D 的模型坐标系
     virtual void updateMatrix() noexcept;
 
-    /**  @brief 更新 Object3D 的世界坐标系，若只有单级节点，则世界坐标等于模型坐标
+    /**
+     * @brief 更新 Object3D 的世界坐标系，每一层的父节点都是子节点的世界坐标。
+     * 如果更新全部节点，则更新完成后所有的节点的 `worldMatrix` 都将局部坐映射到根节点的世界坐标。
+     * 若只有单级节点，则世界坐标等于模型坐标（即将模型坐标直接映射到世界坐标中）
      * @param updateParent 如果有父节点，那么需要回溯父节点的 `worldMatrix`
      * @param updateChildren 递归更新子节点的 `worldMatrix`
      * @return 祖先节点`worldMatrix`的累乘
@@ -146,8 +151,8 @@ class Object3D : public std::enable_shared_from_this<Object3D>, public ObjectTyp
     glm::vec3 mPosition{glm::vec3(0.0f)};                      // 局部坐标
     glm::quat mQuaternion{glm::quat(1.0f, 0.0f, 0.0f, 0.0f)};  // 旋转四元数
     glm::vec3 mScale{glm::vec3(1.0f)};                         // 缩放
-    glm::mat4 mLocalMatrix = glm::mat4(1.0f);                  // 局部坐标系model变换
-    glm::mat4 mWorldMatrix = glm::mat4(1.0f);                  // 世界坐标系model变换
+    glm::mat4 mLocalMatrix = glm::mat4(1.0f);                  // 局部坐标系
+    glm::mat4 mWorldMatrix = glm::mat4(1.0f);                  // 世界坐标系
 
     /// 保留参数
     bool mNeedsUpdate{false};
@@ -156,11 +161,11 @@ class Object3D : public std::enable_shared_from_this<Object3D>, public ObjectTyp
     std::weak_ptr<Object3D>    mParent;      // 父节点采用weakPtr ，防止循环引用
     std::vector<Object3D::ptr> mChildren{};  // 父节点存储了子节点的sharedPtr，建立一次引用,保证子节点的引用计数至少大于1
 
-    /// for shading
-    /// modelViewMatrix将模型顶点，从模型坐标系，转换到当前摄像机坐标系,viewMatrix * worldMatrix
+    // for shading
+    // modelViewMatrix将模型顶点，从模型坐标系，转换到当前摄像机坐标系,viewMatrix * worldMatrix
     glm::mat4 mModelViewMatrix = glm::mat4(1.0f);
 
-    /// 将模型的normal从模型坐标系，转换到摄像机坐标系
+    /// 将模型的normal从模型坐标系，转换到世界坐标系
     glm::mat3 mNormalMatrix = glm::mat3(1.0f);
 };
 
