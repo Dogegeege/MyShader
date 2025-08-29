@@ -264,8 +264,11 @@ int main() {
         glfwPollEvents();                           // 处理事件
         glfwSwapBuffers(windowRender.getWindow());  // 交换缓冲
     }
+
     // 显式写出
     ui.~UIRender();
     windowRender.~WindowRender();
+
+    std::cout << "程序正常退出!" << std::endl;
     return 0;
 }

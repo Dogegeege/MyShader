@@ -2,6 +2,10 @@
 
 #include "global.h"
 
+#include <glad/glad.h>
+
+#include <GLFW/glfw3.h>
+
 namespace engine {
 
 static unsigned int toGL(const DataType& value) {

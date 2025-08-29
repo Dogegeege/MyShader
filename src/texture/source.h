@@ -2,7 +2,10 @@
 #include "global.h"
 
 namespace engine {
-/// 用来管理一张图片读入后的结果即数据
+
+/**
+ * @brief 存储导入资源的实体，如图片（纹理）
+ */
 class Source {
    public:
     using ptr = std::shared_ptr<Source>;
@@ -25,4 +28,5 @@ class Source {
     /// 在缓存情况下，refCount记录了本Source当前被多少个对象引用，当引用为0，卸载析构
     uint32_t mRefCount{0};
 };
+
 }  // namespace engine

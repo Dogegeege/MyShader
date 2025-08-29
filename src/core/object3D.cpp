@@ -190,7 +190,7 @@ bool Object3D::addChild(const Object3D::ptr& child) noexcept {
 
     child->mParent = shared_from_this();
 
-    auto iter = std::find(mChildren.begin(), mChildren.end(), child);
+        auto iter = std::find(mChildren.begin(), mChildren.end(), child);
     if (iter != mChildren.end()) { return false; }
 
     mChildren.push_back(child);

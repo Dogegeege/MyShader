@@ -56,7 +56,7 @@ class Texture {
     uint32_t      mWidth{0};                              // 宽
     uint32_t      mHeight{0};                             // 高
 
-    /// @brief 原图片数据
+    /// @brief 原图片数据指针
     Source::ptr mSource{nullptr};
 
     bool mNeedsUpdate{true};

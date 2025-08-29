@@ -2,17 +2,15 @@
 
 #include <assert.h>
 #include <math.h>
+#include <algorithm>
 #include <bitset>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <unordered_map>
 #include <vector>
-
-#include <glad/glad.h>
-
-#include <GLFW/glfw3.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
